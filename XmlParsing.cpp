@@ -17,7 +17,7 @@ char* XmlParsing::parse_letter(char buffer[],  int GameId, char* Word,char* Dash
 	xml_node<> *RootNode = document.first_node();
 	xml_node<> *FirstNode = RootNode->first_node();
 	string TagName = FirstNode->name();
-	 if (TagName.compare("letter") == 0)
+	if (TagName == LETTER)
 	{
 		string XmlLetter = FirstNode->value();
 		char Letter[1];
@@ -34,7 +34,7 @@ int XmlParsing::create_or_join(char buffer[])
 	xml_node<> *RootNode = document.first_node();
 	xml_node<> *FirstNode = RootNode->first_node();
 	string TagName = FirstNode->name();
-	if (TagName.compare("create") == 0)
+	if (TagName == CREATE)
 	{
 		return 1;
 	}
