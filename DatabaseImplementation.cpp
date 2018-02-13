@@ -288,6 +288,7 @@ string DatabaseImplementation::insert_into_game_details(int GameId, char* UserNa
 	SqlWordId = WordId;
 	ReturnCode = SQLBindParameter(SqlHandle, 4, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlSocketAddress, 0, &PtrValue);
 	SqlSocketAddress = SocketAddress;
+	ReturnCode = SQLExecute(SqlHandle);
 	/*check whether the query is executed successfully if not then it will return string*/
 	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Inserted Successfully";

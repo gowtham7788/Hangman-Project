@@ -6,7 +6,7 @@ class GameLogic
 {
 private:
 	DatabaseInterface* DbInterface = new DatabaseImplementation();
-	char WrongGuess[MAXIMUMGUESS] ;
+	char WrongGuess[MAXIMUMGUESS];
 	int RemainingGuess = MAXIMUMGUESS;
 	string Result;
 	int DashCount = 0;

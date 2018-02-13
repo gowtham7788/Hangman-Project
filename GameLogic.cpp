@@ -161,6 +161,6 @@ string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash
 		Result = "playing";
 	}
 	
-	string GameInfo = "<"HANGMAN"></"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><result>" + Result + "</"RESULT">";
+	string GameInfo = "<"HANGMAN"><"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"RESULT">" + Result + "</"RESULT">";
 	return GameInfo;
 }

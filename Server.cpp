@@ -14,13 +14,14 @@ void Server::receive_message(int client, int GameId, string Word)
 	string Dash;
 	char Buffer[1024];
 	int ReceivedBytes = 0;
-	char Letter=' ';
+	char Letter[4] = {'l','i','o','n'};
 	int client1;
 
 	Dash = logic.fill_dash(Word);
 	string FillDash = Dash;
-
+	string Result;
 	unsigned int iteration=0;
+	unsigned int i = 0;
 	unsigned int iteration1 = 0;
 	vector<GameDetails> GameDetails;				
 
@@ -28,28 +29,27 @@ void Server::receive_message(int client, int GameId, string Word)
 		{
 			iteration = iteration % GameDetails.size();
 			client = GameDetails[iteration].get_socket_address();
-			string GameInfo = logic.calculate_result(logic, Dash, FillDash, GameId,Letter);
-			Dash = XmlParse.get_dash(GameInfo);
+			string GameInfo = logic.calculate_result(logic, Dash, FillDash, GameId,Letter[i]);
 			for (iteration1 = 0; iteration1 < GameDetails.size(); iteration1++)							//send game info to the all UI which is in same game id
 			{
 				client1 = GameDetails[iteration1].get_socket_address();
 				if (client == client1)
 				{
-					GameInfo = GameInfo + "<"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					send(client1, GameInfo.c_str(), sizeof(GameInfo), 0);
+					Result = GameInfo + "<"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					send(client1, Result.c_str(), sizeof(Result), 0);
 				}
 				else
 				{
-					GameInfo = GameInfo + "<"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					send(client1, GameInfo.c_str(), sizeof(GameInfo), 0);
+					Result = GameInfo + "<"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					send(client1, Result.c_str(), sizeof(Result), 0);
 				}
 			}
-
+			Dash = XmlParse.get_dash(Result);
 			if ((GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)
 			{
 				ReceivedBytes = recv(client, Buffer, sizeof(Buffer), 0);
-				Letter = XmlParse.get_letter(Buffer);
-				FillDash = XmlParse.parse_letter(Letter, GameId, Word, Dash);
+				//Letter = XmlParse.get_letter(Buffer);
+				FillDash = XmlParse.parse_letter(Letter[i], GameId, Word, Dash);
 			}
 			else
 			{
@@ -64,6 +64,7 @@ void Server::receive_message(int client, int GameId, string Word)
 				break;
 			}
 			iteration++;
+			i++;
 		}
 }
 void Server::choose_game_type(int client)
