@@ -13,34 +13,33 @@ int GameLogic::get_remaining_guess()
 {
 	return RemainingGuess;
 }
-char* GameLogic::get_wrong_guess()
+string GameLogic::get_wrong_guess()
 {
 	return WrongGuess;
 }
-string GameLogic::get_result()
-{
-	return Result;
-}
+
 vector<GameDetails> GameLogic::get_particular_gameid_details(int GameId)
 {
 	vector<GameDetails> GameDetails = DbInterface->get_playing_game_detail(GameId);
 	return GameDetails;
 }
 
-string GameLogic::get_word_from_database(char* CategoryName, char* DifficultyName)
+string GameLogic::get_word_from_database(string CategoryName, string DifficultyName)
 {
-	string Word = DbInterface->get_word(CategoryName,DifficultyName);	
+	string Word = DbInterface->get_word((char*)CategoryName.c_str(), (char*)DifficultyName.c_str());
 	return Word;
 }
-string GameLogic::insert_into_database(int GameId, char* UserName, int SocketAddress, char* Word)
+string GameLogic::insert_into_database(int GameId, string UserName, int SocketAddress, string Word)
 {
-	DbInterface->insert_into_game_details(GameId, UserName, SocketAddress, Word);
+	string Status = DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)Word.c_str());
+	return Status;
 }
-string GameLogic::insert_into_database(int GameId, char* UserName, int SocketAddress)
+string GameLogic::insert_into_database(int GameId, string UserName, int SocketAddress)
 {
 	vector<GameDetails> GameDetail = DbInterface->get_playing_game_detail(GameId);
-	char* DbWord = (char*)(GameDetail[0].get_word_id().get_word()).c_str();
-	DbInterface->insert_into_game_details(GameId, UserName, SocketAddress, DbWord);
+	string DbWord = (GameDetail[0].get_word_id().get_word());
+	string Status = DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)DbWord.c_str());
+	return Status;
 }
 int GameLogic::generate_gameid()
 {
@@ -51,7 +50,7 @@ int GameLogic::generate_gameid()
 string GameLogic::category_list_and_difficulty_level()
 {
 	string List;
-	int iteration = 0;
+	unsigned int iteration = 0;
 	List = "<"HANGMAN"><"CATEGORYLIST">";
 	vector<Category> CategoryList = DbInterface->get_category();
 	for (iteration = 0; iteration < CategoryList.size(); iteration++)
@@ -70,10 +69,15 @@ string GameLogic::category_list_and_difficulty_level()
 	List = List + "</"DIFFICULTYLEVEL"></"HANGMAN">";
 	return List;
 }
+vector<int> GameLogic::get_socket_address_by_gameid_from_database(int GameId)
+{
+	vector<int> SocketAddress = DbInterface->get_socket_address_by_game_id(GameId);
+	return SocketAddress;
+}
 
 string GameLogic::get_all_playing_game()
 {
-	int iteration = 0;
+	unsigned int iteration = 0;
 	string JoinGameidList;
 	vector<GameDetails> GameDetail = DbInterface->get_playing_game_detail();
 	JoinGameidList = "<"HANGMAN"><"JOIN">";
@@ -86,27 +90,28 @@ string GameLogic::get_all_playing_game()
 
 	return JoinGameidList;
 }
-char* GameLogic::fill_dash(char* Word, char* Dash)
+string GameLogic::fill_dash(string Word)
 {
 	size_t Index = 0;
-	for (Index = 0; Index < strlen(Word); Index++)
+	string Dash;
+	for (Index = 0; Index < Word.size(); Index++)
 	{
 		if (!isspace(Word[Index]))
 		{
-			Dash[Index] = '_';
+			Dash.append("_");
 		}
 		else
 		{
-			Dash[Index] = ' ';
+			Dash.append(" ");
 		}
 	}
 	return Dash;
 }
 
-char* GameLogic::input_character(char* Word, char* Dash, char Letter)
+string GameLogic::input_character(string Word, string Dash, char Letter)
 {
 	size_t CharIndex;
-	for (CharIndex = 0; CharIndex < strlen(Word); CharIndex++)
+	for (CharIndex = 0; CharIndex < Word.size(); CharIndex++)
 	{
 		if (Word[CharIndex] == tolower(Letter) || Word[CharIndex] == toupper(Letter))
 		{
@@ -115,11 +120,11 @@ char* GameLogic::input_character(char* Word, char* Dash, char Letter)
 	}
 	return Dash;
 }
-int GameLogic::calculate_number_of_dash(char* Word)
+int GameLogic::calculate_number_of_dash(string Word)
 {
 	size_t Index;
 	int Count = 0;
-	for (Index = 0; Index < strlen(Word); Index++)
+	for (Index = 0; Index < Word.size(); Index++)
 	{
 		if (Word[Index] == '_')
 		{
@@ -129,16 +134,16 @@ int GameLogic::calculate_number_of_dash(char* Word)
 	return Count;
 }
 
-string GameLogic::calculate_result(GameLogic logic,char* Dash,char* FillDash,int GameId)
+string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash, int GameId, char Letter)
 {
-	if (strcmp(Dash, FillDash) == 0)
+	if (Dash.compare(FillDash) == 0)
 	{
-		WrongGuess[MaximumGuess-RemainingGuess]=
+		WrongGuess[MAXIMUMGUESS - RemainingGuess] = Letter;
 		RemainingGuess--;
 	}
 	else
 	{
-		strcpy_s(Dash, sizeof(FillDash), FillDash);
+		Dash = FillDash;
 	}
 	DashCount = logic.calculate_number_of_dash(Dash);
 	if (DashCount == 0)
@@ -156,6 +161,6 @@ string GameLogic::calculate_result(GameLogic logic,char* Dash,char* FillDash,int
 		Result = "playing";
 	}
 	
-	string GameInfo = "<"HANGMAN"></"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><result>" + logic.get_result() + "</"RESULT">";
+	string GameInfo = "<"HANGMAN"></"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><result>" + Result + "</"RESULT">";
 	return GameInfo;
 }

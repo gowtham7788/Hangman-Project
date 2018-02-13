@@ -1,41 +1,34 @@
 #pragma once
-#include <string>
-#include <vector>
-#include "DatabaseInterface.h"
 #include "DatabaseImplementation.h"
-#include "Property.h"
-#include "GameDetails.h"
 using namespace std;
-#define MaximumGuess 6
+
 class GameLogic
 {
 private:
-	
 	DatabaseInterface* DbInterface = new DatabaseImplementation();
-	char WrongGuess[MaximumGuess];
-	int RemainingGuess = MaximumGuess;
+	char WrongGuess[MAXIMUMGUESS] ;
+	int RemainingGuess = MAXIMUMGUESS;
 	string Result;
 	int DashCount = 0;
-
+	int get_remaining_guess();
+	string get_wrong_guess();
 public:
 	GameLogic();
 	~GameLogic();
-	int get_remaining_guess();
-	char* get_wrong_guess();
-	string get_result();
-	int calculate_number_of_dash(char*);
-	char* input_character(char*, char[],char);
-	char* fill_dash(char*,char*);
-	string calculate_result(GameLogic,char*,char*,int );
+	int generate_gameid();
+	int calculate_number_of_dash(string Word);
+	string input_character(string Word, string Dash, char Letter);
+	string fill_dash(string Word);
+	string calculate_result(GameLogic, string Dash, string FillDash, int GameId, char Letter);
+
+	string get_word_from_database(string CategoryName, string DifficultyName);
+	string insert_into_database(int GameId, string Username, int SocketAddress, string Word);
+	string insert_into_database(int GameId, string UserName, int SocketAddress);
+	string get_all_playing_game();
+	string category_list_and_difficulty_level();
 	vector<GameDetails> get_particular_gameid_details(int GameId);
 	vector<GameDetails> get_all_game_details();
-	string get_word_from_database(char* CategoryName, char* DifficultyName);
-	string insert_into_database(int GameId, char* Username, int SocketAddress, char* Word);
-	string insert_into_database(int GameId, char* UserName, int SocketAddress);
-	int generate_gameid();
-	string get_all_playing_game();
-	vector<Category>  get_category_list();
-	vector<Difficulty> get_difficulty_list();
-	string category_list_and_difficulty_level();
+	vector<int> get_socket_address_by_gameid_from_database(int GameId);
+	
 };
 

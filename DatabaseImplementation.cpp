@@ -15,6 +15,11 @@ DatabaseImplementation::~DatabaseImplementation()
 	SQLFreeHandle(SQL_HANDLE_DBC, SqlConnHandle);
 }
 
+SQLHANDLE DatabaseImplementation::select(SQLHANDLE SqlHandle,SQLWCHAR* Query)
+{
+	return (SQL_SUCCESS != SQLExecDirect(SqlHandle, Query, SQL_NTS)) ? SqlHandle : SqlHandle;
+}
+
 /*This method is to get list of category from database and return it as vector of category object*/
 vector<Category> DatabaseImplementation::get_category()
 {
@@ -22,14 +27,8 @@ vector<Category> DatabaseImplementation::get_category()
 	Category CategoryObject;
 	SQLHANDLE SqlHandle = NULL; 
 	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
-	string Temp;
 	/*check whether the query is executed successfully if not then it will return empty vector*/
-	if (SQL_SUCCESS != SQLExecDirect(SqlHandle, (SQLWCHAR*)GET_CATEGORY, SQL_NTS))
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return CategoryVector;
-	}
-	else 
+	if (SqlHandle = (select(SqlHandle, GET_CATEGORY)))
 	{
 		SQLINTEGER Id, IsActive, PtrSqlVersion;
 		SQLCHAR Name[50];
@@ -41,8 +40,7 @@ vector<Category> DatabaseImplementation::get_category()
 			SQLGetData(SqlHandle, 3, SQL_INTEGER, &IsActive, 0, &PtrSqlVersion);
 
 			CategoryObject.set_id(Id);
-			Temp = Cryption.decoder((char*)Name);//method to decrypt the string from human non-understandable form to readable string
-			CategoryObject.set_name(Temp);
+			CategoryObject.set_name(Cryption.decoder((char*)Name));//method to decrypt the string from human non-understandable form to readable string
 			CategoryObject.set_is_active(IsActive);
 			CategoryVector.push_back(CategoryObject);
 		}
@@ -57,15 +55,9 @@ vector<Difficulty> DatabaseImplementation::get_difficulty()
 	vector<Difficulty> DifficultyVector;
 	Difficulty DifficultyObject;
 	SQLHANDLE SqlHandle = NULL;
-	string Temp;
 	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
 	/*check whether the query is executed successfully if not then it will return empty vector*/
-	if (SQL_SUCCESS != SQLExecDirect(SqlHandle, (SQLWCHAR*)GET_DIFFICULTY, SQL_NTS)) 
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return DifficultyVector;
-	}
-	else 
+	if (SqlHandle = (select(SqlHandle, GET_DIFFICULTY)))
 	{
 		SQLINTEGER Id, IsActive, PtrSqlVersion;
 		SQLCHAR Name[50];
@@ -77,8 +69,7 @@ vector<Difficulty> DatabaseImplementation::get_difficulty()
 			SQLGetData(SqlHandle, 3, SQL_INTEGER, &IsActive, 0, &PtrSqlVersion);
 
 			DifficultyObject.set_id(Id);
-			Temp = Cryption.decoder((char*)Name);//method to decrypt the string from human non-understandable form to readable string
-			DifficultyObject.set_name(Temp);
+			DifficultyObject.set_name(Cryption.decoder((char*)Name));//method to decrypt the string from human non-understandable form to readable string
 			DifficultyObject.set_is_active(IsActive);
 			DifficultyVector.push_back(DifficultyObject);
 		}
@@ -91,37 +82,13 @@ vector<Difficulty> DatabaseImplementation::get_difficulty()
 vector<GameDetails> DatabaseImplementation::get_playing_game_detail()
 {
 	vector<GameDetails> GameDetailsVector;
-	GameDetails GameDetailsObject;
-	Words WordObject;
 	SQLHANDLE SqlHandle = NULL;
 	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
 	string Temp;
 	/*check whether the query is executed successfully if not then it will return empty vector*/
-	if (SQL_SUCCESS != SQLExecDirect(SqlHandle, (SQLWCHAR*)GET_PLAYING_GAME_DETAILS, SQL_NTS)) 
+	if (SqlHandle = (select(SqlHandle, GET_PLAYING_GAME_DETAILS)))
 	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return GameDetailsVector;
-	}
-	else 
-	{
-		SQLINTEGER GameId, SocketAddress, PtrSqlVersion;
-		SQLCHAR UserName[50], Word[50];
-		/*while loop to fetch the data from the handler and store it into vector*/
-		while (SQLFetch(SqlHandle) == SQL_SUCCESS)
-		{
-			SQLGetData(SqlHandle, 1, SQL_INTEGER, &GameId, 0, &PtrSqlVersion);
-			SQLGetData(SqlHandle, 2, SQL_CHAR, UserName, 50, &PtrSqlVersion);
-			SQLGetData(SqlHandle, 3, SQL_INTEGER, &SocketAddress, 0, &PtrSqlVersion);
-			SQLGetData(SqlHandle, 4, SQL_CHAR, Word, 50, &PtrSqlVersion);
-			GameDetailsObject.set_game_id(GameId);
-			Temp = Cryption.decoder((char*)UserName);//method to decrypt the string from human non-understandable form to readable string
-			GameDetailsObject.set_username(Temp);
-			GameDetailsObject.set_socket_address(SocketAddress);
-			Temp = Cryption.decoder((char*)Word);//method to decrypt the string from human non-understandable form to readable string
-			WordObject.set_word(Temp);
-			GameDetailsObject.set_word_id(WordObject);
-			GameDetailsVector.push_back(GameDetailsObject);
-		}
+		GameDetailsVector = get_game_details_from_sqlhandler(SqlHandle);
 	}
 	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 	return GameDetailsVector;
@@ -131,8 +98,6 @@ vector<GameDetails> DatabaseImplementation::get_playing_game_detail()
 vector<GameDetails> DatabaseImplementation::get_playing_game_detail(int GameId)
 {
 	vector<GameDetails> GameDetailsVector;
-	GameDetails GameDetailsObject;
-	Words WordObject;
 	SQLHANDLE SqlHandle = NULL;
 	SQLRETURN ReturnCode;
 	SQLINTEGER SqlGameId, PtrValue = SQL_NTS;
@@ -150,43 +115,79 @@ vector<GameDetails> DatabaseImplementation::get_playing_game_detail(int GameId)
 	}
 	else
 	{
-		SQLINTEGER GameId, SocketAddress, PtrSqlVersion;
-		SQLCHAR UserName[50], Word[50];
-		/*while loop to fetch the data from the handler and store it into vector*/
-		while (SQLFetch(SqlHandle) == SQL_SUCCESS)
-		{
-			SQLGetData(SqlHandle, 1, SQL_INTEGER, &GameId, 0, &PtrSqlVersion);
-			SQLGetData(SqlHandle, 2, SQL_CHAR, UserName, 50, &PtrSqlVersion);
-			SQLGetData(SqlHandle, 3, SQL_INTEGER, &SocketAddress, 0, &PtrSqlVersion);
-			SQLGetData(SqlHandle, 4, SQL_CHAR, Word, 50, &PtrSqlVersion);
-			GameDetailsObject.set_game_id(GameId);
-			Temp = Cryption.decoder((char*)UserName);//method to decrypt the string from human non-understandable form to readable string
-			GameDetailsObject.set_username(Temp);
-			GameDetailsObject.set_socket_address(SocketAddress);
-			Temp = Cryption.decoder((char*)Word);//method to decrypt the string from human non-understandable form to readable string
-			WordObject.set_word(Temp);
-			GameDetailsObject.set_word_id(WordObject);
-			GameDetailsVector.push_back(GameDetailsObject);
-		}
+		GameDetailsVector = get_game_details_from_sqlhandler(SqlHandle);
 	}
 	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 	return GameDetailsVector;
+}
+
+/*This method is to return gamedetails vector for the given SqlHandler*/
+vector<GameDetails> DatabaseImplementation::get_game_details_from_sqlhandler(SQLHANDLE SqlHandle)
+{
+	vector<GameDetails> GameDetailsVector;
+	GameDetails GameDetailsObject;
+	Words WordObject;
+	SQLINTEGER GameId, SocketAddress, PtrSqlVersion;
+	SQLCHAR UserName[50], Word[50];
+	/*while loop to fetch the data from the handler and store it into vector*/
+	while (SQLFetch(SqlHandle) == SQL_SUCCESS)
+	{
+		SQLGetData(SqlHandle, 1, SQL_INTEGER, &GameId, 0, &PtrSqlVersion);
+		SQLGetData(SqlHandle, 2, SQL_CHAR, UserName, 50, &PtrSqlVersion);
+		SQLGetData(SqlHandle, 3, SQL_INTEGER, &SocketAddress, 0, &PtrSqlVersion);
+		SQLGetData(SqlHandle, 4, SQL_CHAR, Word, 50, &PtrSqlVersion);
+		GameDetailsObject.set_game_id(GameId);
+		GameDetailsObject.set_username(Cryption.decoder((char*)UserName));//method to decrypt the string from human non-understandable form to readable string
+		GameDetailsObject.set_socket_address(SocketAddress);
+		WordObject.set_word(Cryption.decoder((char*)Word));//method to decrypt the string from human non-understandable form to readable string
+		GameDetailsObject.set_word_id(WordObject);
+		GameDetailsVector.push_back(GameDetailsObject);
+	}
+	return GameDetailsVector;
+}
+
+/*This method is to give the socket address for the given game id*/
+vector<int> DatabaseImplementation::get_socket_address_by_game_id(int GameId)
+{
+	vector<int> SocketVector;
+	SQLHANDLE SqlHandle = NULL;
+	SQLRETURN ReturnCode;
+	SQLINTEGER SqlGameId, PtrValue = SQL_NTS;
+	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
+	string Temp;
+	ReturnCode = SQLPrepare(SqlHandle, GET_SOCKET_ADDRESS_BY_GAME_ID, SQL_NTS);
+	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlGameId, 0, &PtrValue);
+	SqlGameId = GameId;
+	ReturnCode = SQLExecute(SqlHandle);
+	/*check whether the query is executed successfully if not then it will return empty vector*/
+	if (SQL_SUCCESS != ReturnCode)
+	{
+		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+		return SocketVector;
+	}
+	else
+	{
+		SQLINTEGER SocketAddress, PtrSqlVersion;
+		/*while loop to fetch the data from the handler and store it into vector*/
+		while (SQLFetch(SqlHandle) == SQL_SUCCESS)
+		{
+			SQLGetData(SqlHandle, 1, SQL_INTEGER, &SocketAddress, 0, &PtrSqlVersion);
+			SocketVector.push_back(SocketAddress);
+		}
+	}
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return SocketVector;
 }
 
 /*This method is to give the maximum game id to the business logic for creating a new unique game id for new game*/
 int DatabaseImplementation::get_maximum_game_id()
 {
 	SQLHANDLE SqlHandle = NULL;
+	SQLINTEGER GameId, PtrSqlVersion;
 	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
 	/*check whether the query is executed successfully if not then it will return -1 to indicate no execution failed*/
-	if (SQL_SUCCESS != SQLExecDirect(SqlHandle, (SQLWCHAR*)GET_MAXIMUM_GAME_ID, SQL_NTS)) 
+	if (SqlHandle = (select(SqlHandle, GET_MAXIMUM_GAME_ID)))
 	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return -1;
-	}
-	else 
-	{
-		SQLINTEGER GameId, PtrSqlVersion;
 		/*while loop to fetch the data from the handler*/
 		while (SQLFetch(SqlHandle) == SQL_SUCCESS)
 		{
@@ -194,15 +195,8 @@ int DatabaseImplementation::get_maximum_game_id()
 		}
 
 		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		if (GameId > 0)
-		{
-			return GameId;
-		}
-		else
-		{
-			return 0;
-		}
 	}
+	return (GameId > 0) ? GameId : 0;
 }
 
 /*This method id to update the game result by using the game id*/
@@ -220,16 +214,8 @@ string DatabaseImplementation::update_game_result(int GameId, char* Result)
 	SqlGameId = GameId;
 	ReturnCode = SQLExecute(SqlHandle);
 	/*check whether the query is executed successfully if not then it will return a string*/
-	if (SQL_SUCCESS != ReturnCode) 
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Error querying SQL Server";
-	}
-	else 
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Updated Successfully";
-	}
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Updated Successfully";
 }
 
 /*This method will give a random word from database for a new game based on category name and difficulty name choosen by the user*/
@@ -240,12 +226,9 @@ string DatabaseImplementation::get_word(char* CategoryName, char* DifficultyName
 	SQLRETURN ReturnCode;
 	char SqlCategory[50], SqlDifficulty[50];
 	SQLINTEGER PtrValue = SQL_NTS, PtrSqlVersion;
-	string Temp;
 	ReturnCode = SQLPrepare(SqlHandle, GET_WORD, SQL_NTS);
-	Temp = Cryption.encoder(CategoryName); //method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlCategory, _countof(SqlCategory), Temp.c_str());
-	Temp = Cryption.encoder(DifficultyName);//method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlDifficulty, _countof(SqlDifficulty), Temp.c_str());
+	strcpy_s((char*)SqlCategory, _countof(SqlCategory), Cryption.encoder(CategoryName).c_str()); //method to encrypt the string to human non-understandable form
+	strcpy_s((char*)SqlDifficulty, _countof(SqlDifficulty), Cryption.encoder(DifficultyName).c_str());//method to encrypt the string to human non-understandable form
 	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(CategoryName), 0, &SqlCategory, 0, &PtrValue);
 	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(DifficultyName), 0, &SqlDifficulty, 0, &PtrValue);
 	/*check whether the query is executed successfully if not then it will return string*/
@@ -263,9 +246,7 @@ string DatabaseImplementation::get_word(char* CategoryName, char* DifficultyName
 			SQLGetData(SqlHandle, 1, SQL_CHAR, Word, 50, &PtrSqlVersion);
 		}
 		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		Temp = Cryption.decoder(Word);//method to decrypt the string from human non-understandable form to readable string
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return Temp;
+		return Cryption.decoder(Word);//method to decrypt the string from human non-understandable form to readable string;
 	}
 }
 
@@ -278,12 +259,10 @@ string DatabaseImplementation::insert_into_game_details(int GameId, char* UserNa
 	int WordId;
 	char SqlUserName[50], SqlWord[50];
 	SQLINTEGER SqlGameId, SqlWordId, SqlSocketAddress, PtrValue = SQL_NTS, PtrSqlVersion;
-	string Temp;
 
 	ReturnCode = SQLPrepare(SqlHandle, SELECT_WORD_ID, SQL_NTS);
 	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(Word), 0, &SqlWord, 0, &PtrValue);
-	Temp = Cryption.encoder(Word);//method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlWord, _countof(SqlWord), Temp.c_str());
+	strcpy_s((char*)SqlWord, _countof(SqlWord), Cryption.encoder(Word).c_str());//method to encrypt the string to human non-understandable form
 	/*check whether the query is executed successfully if not then it will return string*/
 	if (SQL_SUCCESS != SQLExecute(SqlHandle)) 
 	{
@@ -304,23 +283,14 @@ string DatabaseImplementation::insert_into_game_details(int GameId, char* UserNa
 	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlGameId, 0, &PtrValue);
 	SqlGameId = GameId;
 	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(UserName), 0, &SqlUserName, 0, &PtrValue);
-	Temp = Cryption.encoder(UserName);//method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlUserName, _countof(SqlUserName), Temp.c_str());
+	strcpy_s((char*)SqlUserName, _countof(SqlUserName), Cryption.encoder(UserName).c_str());//method to encrypt the string to human non-understandable form
 	ReturnCode = SQLBindParameter(SqlHandle, 3, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlWordId, 0, &PtrValue);
 	SqlWordId = WordId;
 	ReturnCode = SQLBindParameter(SqlHandle, 4, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlSocketAddress, 0, &PtrValue);
 	SqlSocketAddress = SocketAddress;
 	/*check whether the query is executed successfully if not then it will return string*/
-	if (SQL_SUCCESS != SQLExecute(SqlHandle)) 
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Error querying SQL Server";
-	}
-	else 
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Inserted Successfully";
-	}
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Inserted Successfully";
 }
 
 /*This is private class method for inserting into category table while starting the server
@@ -332,25 +302,15 @@ string DatabaseImplementation::insert_into_category(char* Name, int IsActive)
 	SQLRETURN ReturnCode;
 	char SqlName[50];
 	SQLINTEGER SqlIsActive, PtrValue = SQL_NTS;
-	string Temp;
 	ReturnCode = SQLPrepare(SqlHandle, (SQLWCHAR*)INSERT_INTO_CATEGORY, SQL_NTS);
 	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(Name), 0, &SqlName, 0, &PtrValue);
-	Temp = Cryption.encoder(Name);//method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlName, _countof(SqlName), Temp.c_str());
+	strcpy_s((char*)SqlName, _countof(SqlName), Cryption.encoder(Name).c_str());//method to encrypt the string to human non-understandable form
 	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlIsActive, 0, &PtrValue);
 	SqlIsActive = IsActive;
 	ReturnCode = SQLExecute(SqlHandle);
 	/*check whether the query is executed successfully if not then it will return string*/
-	if (SQL_SUCCESS != ReturnCode)
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Error querying SQL Server";
-	}
-	else 
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Inserted Successfully";
-	}
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Inserted Successfully";
 }
 
 /*This is private class method for inserting into difficulty table while starting the server
@@ -362,25 +322,15 @@ string DatabaseImplementation::insert_into_difficulty(char* Name, int IsActive)
 	SQLRETURN ReturnCode;
 	char SqlName[50];
 	SQLINTEGER  SqlIsActive, PtrValue = SQL_NTS;
-	string Temp;
 	ReturnCode = SQLPrepare(SqlHandle, (SQLWCHAR*)INSERT_INTO_DIFFICULTY, SQL_NTS);
 	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(Name), 0, &SqlName, 0, &PtrValue);
-	Temp = Cryption.encoder(Name);//method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlName, _countof(SqlName), Temp.c_str());
+	strcpy_s((char*)SqlName, _countof(SqlName), Cryption.encoder(Name).c_str());//method to encrypt the string to human non-understandable form
 	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlIsActive, 0, &PtrValue);
 	SqlIsActive = IsActive;
 	ReturnCode = SQLExecute(SqlHandle);
 	/*check whether the query is executed successfully if not then it will return string*/
-	if (SQL_SUCCESS != ReturnCode)
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Error querying SQL Server";
-	}
-	else
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Inserted Successfully";
-	}
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Inserted Successfully";
 }
 
 /*This is private class method for inserting into words table while starting the server
@@ -392,29 +342,30 @@ string DatabaseImplementation::insert_into_words(int CategoryId, int DifficultyI
 	SQLRETURN ReturnCode;
 	char SqlWord[50];
 	SQLINTEGER SqlIsActive,SqlCategoryId,SqlDifficultyId, PtrValue = SQL_NTS;
-	string Temp;
 	ReturnCode = SQLPrepare(SqlHandle, (SQLWCHAR*)INSERT_INTO_WORDS, SQL_NTS);
 	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlCategoryId, 0, &PtrValue);
 	SqlCategoryId = CategoryId;
 	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlDifficultyId, 0, &PtrValue);
 	SqlDifficultyId = DifficultyId;
 	ReturnCode = SQLBindParameter(SqlHandle, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(Word), 0, &SqlWord, 0, &PtrValue);
-	Temp = Cryption.encoder(Word);//method to encrypt the string to human non-understandable form
-	strcpy_s((char*)SqlWord, _countof(SqlWord), Temp.c_str());
+	strcpy_s((char*)SqlWord, _countof(SqlWord), Cryption.encoder(Word).c_str());//method to encrypt the string to human non-understandable form
 	ReturnCode = SQLBindParameter(SqlHandle, 4, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlIsActive, 0, &PtrValue);
 	SqlIsActive = IsActive;
 	ReturnCode = SQLExecute(SqlHandle);
 	/*check whether the query is executed successfully if not then it will return string*/
-	if (SQL_SUCCESS != ReturnCode)
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Error querying SQL Server";
-	}
-	else
-	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		return "Inserted Successfully";
-	}
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Inserted Successfully";
+}
+
+/*This method to execute procedure call*/
+SQLRETURN DatabaseImplementation::procedure_call(SQLWCHAR* Query)
+{
+	SQLHANDLE SqlHandle = NULL;
+	SQLRETURN ReturnCode;
+	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
+	ReturnCode = SQLExecDirect(SqlHandle, Query, SQL_NTS);
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return ReturnCode;
 }
 
 /*This is the starting method which will load data to database from xml file
@@ -422,7 +373,7 @@ Before loading the data it will delete the already available data along with the
 and create a new table and insert the new data*/
 void DatabaseImplementation::load_data()
 {
-	XmlParser Xml;
+	DatabaseXmlParser Xml;
 	xml_document<> Document;
 	xml_node<> *Node;
 	ifstream File(XML_FILE);
@@ -436,25 +387,19 @@ void DatabaseImplementation::load_data()
 	vector<Category> CatergoryVector;
 	vector<Difficulty> DifficultyVector;
 	vector<Words> WordVector;
-	SQLHANDLE SqlHandle = NULL;
 	SQLRETURN ReturnCode;
 	string Status;
 	
-	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
-	ReturnCode = SQLExecDirect(SqlHandle, (SQLWCHAR*)CHECK_TABLE_PROCEDURE, SQL_NTS);
+	ReturnCode = procedure_call(CHECK_TABLE_PROCEDURE);
 	if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 		return;
 	}
 	else
 	{
-		SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-		SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
-		ReturnCode = SQLExecDirect(SqlHandle, (SQLWCHAR*)CREATE_CATEGORY_PROCEDURE, SQL_NTS);
+		ReturnCode = procedure_call(CREATE_CATEGORY_PROCEDURE);
 		if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 		{
-			SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 			return;
 		}
 		else
@@ -464,12 +409,9 @@ void DatabaseImplementation::load_data()
 			{
 				Status = insert_into_category((char*)CatergoryVector[i].get_name().c_str(),CatergoryVector[i].get_is_active());
 			}
-			SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-			SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
-			ReturnCode = SQLExecDirect(SqlHandle, (SQLWCHAR*)CREATE_DIFFICULTY_PROCEDURE, SQL_NTS);
+			ReturnCode = procedure_call(CREATE_DIFFICULTY_PROCEDURE);
 			if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 			{
-				SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 				return;
 			}
 			else
@@ -479,12 +421,9 @@ void DatabaseImplementation::load_data()
 				{
 					Status = insert_into_difficulty((char*)DifficultyVector[i].get_name().c_str(), DifficultyVector[i].get_is_active());
 				}
-				SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
-				SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
-				ReturnCode = SQLExecDirect(SqlHandle, (SQLWCHAR*)CREATE_WORDS_PROCEDURE, SQL_NTS);
+				ReturnCode = procedure_call(CREATE_WORDS_PROCEDURE);
 				if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 				{
-					SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 					return;
 				}
 				else
@@ -498,5 +437,4 @@ void DatabaseImplementation::load_data()
 			}
 		}
 	}
-	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
 }

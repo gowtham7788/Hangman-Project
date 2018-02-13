@@ -13,7 +13,7 @@ DatabaseConnection::DatabaseConnection()
 			{
 				SQLDriverConnect(SqlConnHandle,
 					NULL,
-					(SQLWCHAR*) CONNECTION_DRIVER,
+					CONNECTION_DRIVER,
 					SQL_NTS,
 					RetConString,
 					1024,

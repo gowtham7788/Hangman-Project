@@ -20,9 +20,9 @@ int Coder::get_key()
 }
 
 /*this method encode the given string and return a encoded string*/
-string Coder::encoder(string Word)
+string Coder::encoder(string Words)
 {
-	string EncodeWord = Word;
+	string EncodeWord = Words;
 	int WordLength;
 
 	WordLength = (int)EncodeWord.length();
@@ -40,6 +40,20 @@ string Coder::encoder(string Word)
 				else if (EncodeWord[i] == 'Z')
 				{
 					EncodeWord[i] = 'A';
+				}
+				else
+				{
+					EncodeWord[i]++;
+				}
+			}
+		}
+		if (isdigit(EncodeWord[i]))
+		{
+			for (int j = 0; j < Key; j++)
+			{
+				if (EncodeWord[i] == '9')
+				{
+					EncodeWord[i] = '0';
 				}
 				else
 				{
@@ -73,6 +87,20 @@ string Coder::decoder(string Word)
 				else if (DecodeWord[i] == 'A')
 				{
 					DecodeWord[i] = 'Z';
+				}
+				else
+				{
+					DecodeWord[i]--;
+				}
+			}
+		}
+		if (isdigit(DecodeWord[i]))
+		{
+			for (int j = 0; j < Key; j++)
+			{
+				if (DecodeWord[i] == '0')
+				{
+					DecodeWord[i] = '9';
 				}
 				else
 				{

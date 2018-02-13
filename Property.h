@@ -4,6 +4,8 @@
 
 #define JOIN "Join"
 
+#define MAXIMUMGUESS 7
+
 #define CATEGORYLIST "CategoryList"
 
 #define DIFFICULTYLEVEL "DifficultyLevel"
@@ -19,7 +21,7 @@
 #define JOINGAME "JoinGame"
 
 #define REQUEST "Request"
- 
+
 #define RESPONSE "Response"
 
 #define GAMEINFO "GameInfo"
@@ -58,7 +60,7 @@
 
 #define XML_FILE "Data.xml"
 
-#define CONNECTION_DRIVER L"DRIVER={SQL Server};SERVER=IN11W-TRAINEE6\\SQLEXPRESS,49342;DATABASE=Hangman;Trusted=true;"
+#define CONNECTION_DRIVER L"DRIVER={SQL Server};SERVER=IN11W-TRAINEE5\\SQLEXPRESS,49400;DATABASE=Hangman;Trusted=true;"
 
 #define CHECK_TABLE_PROCEDURE L"{ CALL CheckTable}"
 
@@ -85,6 +87,8 @@
 #define GET_MAXIMUM_GAME_ID L"select max(gameid) from gamedetails"
 
 #define GET_PLAYING_GAME_DETAILS_BY_ID L"select gameid, username, socketaddress, words.word from gamedetails join words on gamedetails.wordid = words.id where Result = 'playing' and gameid= ?"
+
+#define GET_SOCKET_ADDRESS_BY_GAME_ID L"select socketaddress from gamedetails where gameid= ?"
 
 #define GET_PLAYING_GAME_DETAILS L"select gameid, username, socketaddress, words.word from gamedetails join words on gamedetails.wordid = words.id where Result = 'playing' order by gameid asc"
 

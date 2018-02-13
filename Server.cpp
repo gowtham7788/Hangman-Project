@@ -7,24 +7,29 @@ Server::~Server()
 {
 }
 
-void Server::receive_message(int client, int GameId, char* Word)
+void Server::receive_message(int client, int GameId, string Word)
 {
 	GameLogic logic;
-	char *Dash = "";
-	char buffer[1024];
+
+	string Dash;
+	char Buffer[1024];
 	int ReceivedBytes = 0;
+	char Letter=' ';
 	int client1;
-	char* FillDash = "";
-	Dash = logic.fill_dash(Word, Dash);
-	int iteration=0;
-	int iteration1=0;
-	vector<GameDetails> GameDetails;				// = DbInterface.get_playing_game_detail(GameId)
+
+	Dash = logic.fill_dash(Word);
+	string FillDash = Dash;
+
+	unsigned int iteration=0;
+	unsigned int iteration1 = 0;
+	vector<GameDetails> GameDetails;				
 
 		while ( (GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)								//change client sockaddr using DB
 		{
 			iteration = iteration % GameDetails.size();
 			client = GameDetails[iteration].get_socket_address();
-			string GameInfo = logic.calculate_result(logic, Dash, FillDash, GameId);
+			string GameInfo = logic.calculate_result(logic, Dash, FillDash, GameId,Letter);
+			Dash = XmlParse.get_dash(GameInfo);
 			for (iteration1 = 0; iteration1 < GameDetails.size(); iteration1++)							//send game info to the all UI which is in same game id
 			{
 				client1 = GameDetails[iteration1].get_socket_address();
@@ -39,13 +44,23 @@ void Server::receive_message(int client, int GameId, char* Word)
 					send(client1, GameInfo.c_str(), sizeof(GameInfo), 0);
 				}
 			}
-			if (GameDetails.size()>0)
+
+			if ((GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)
 			{
-				ReceivedBytes = recv(client, buffer, sizeof(buffer), 0);
-				FillDash = XmlParse.parse_letter(buffer, GameId, Word, Dash);
+				ReceivedBytes = recv(client, Buffer, sizeof(Buffer), 0);
+				Letter = XmlParse.get_letter(Buffer);
+				FillDash = XmlParse.parse_letter(Letter, GameId, Word, Dash);
 			}
 			else
 			{
+				vector<int> ClientAddress;
+				unsigned int iteration2 = 0;
+				ClientAddress = logic.get_socket_address_by_gameid_from_database(GameId);
+				while (iteration2 < ClientAddress.size())
+				{
+					choose_game_type(ClientAddress[iteration2]);
+					iteration2++;
+				}
 				break;
 			}
 			iteration++;
@@ -55,9 +70,8 @@ void Server::choose_game_type(int client)
 {
 	char Buffer[1024];
 	int GameId;
-	char* Word;
+	string Word;
 	string List;
-	int iteration;
 	GameLogic GameLogic;
 	recv(client, Buffer, sizeof(Buffer), 0);
 	int Choice = XmlParse.create_or_join(Buffer);
@@ -86,8 +100,8 @@ void Server::choose_game_type(int client)
 		string Level = LevelNode->value();
 		xml_node<> *UserNameNode = RootNode->first_node("username");
 		string UserName = UserNameNode->value();
-		Word = (char*)(GameLogic.get_word_from_database((char*)Category.c_str(), (char*)Level.c_str())).c_str();						//send category and difficulty level to DB and get a word
-		GameLogic.insert_into_database(GameId, (char*)UserName.c_str(), client, Word);													//send game id , username ,client sockaddr , word to DB
+		Word = (string)(GameLogic.get_word_from_database((string)Category.c_str(), (string)Level.c_str())).c_str();						//send category and difficulty level to DB and get a word
+		GameLogic.insert_into_database(GameId, (string)UserName.c_str(), client, Word);													//send game id , username ,client sockaddr , word to DB
 		receive[GameId] = thread(&Server::receive_message, this, client, GameId, Word);
 	}
 	else if (TagName==JOINGAME)
@@ -97,11 +111,9 @@ void Server::choose_game_type(int client)
 		GameId = stoi(GameIdUser);
 		xml_node<> *UserNameNode = RootNode->first_node("username");
 		string UserName = UserNameNode->value();
-		GameLogic.insert_into_database(GameId, (char*)UserName.c_str(), client);
+		GameLogic.insert_into_database(GameId, (string)UserName.c_str(), client);
 	}
 	document.clear();
-	//std::memset(buffer, 0, sizeof(buffer));
-	ClientCount++;
 }
 void Server::accept_connection()
 {
@@ -109,7 +121,7 @@ void Server::accept_connection()
 
 	if (WSAStartup(MAKEWORD(2, 0), &WSAData) != 0)
 	{
-		cout << "\nWSA startup faild ";
+		cout << "\nWSA startup failed ";
 	}
 
 	if ((server = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)

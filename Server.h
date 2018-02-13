@@ -1,14 +1,16 @@
 #pragma once
+#include <winsock2.h>
+#include <Windows.h>
 #include "rapidxml.hpp"
 //#include "rapidxml_print.hpp"
 #include <iostream>
 #include <thread>
 #include <string>
-#include "XmlParser.h"
+#include "SocketXmlParser.h"
 #include "GameLogic.h"
 #include "Property.h"
 
-#include <winsock2.h>
+
 
 #pragma comment(lib,"libws2_32.a")
 
@@ -17,10 +19,8 @@
 class Server
 {
 private:
-	XmlParser XmlParse;
-	
-	char* Word;
-	int ClientCount = 0;
+	SocketXmlParser XmlParse;
+	string Word;
 	int GameId = 0;
 	SOCKET server, client;
 	thread receive[4];
@@ -30,7 +30,7 @@ public:
 	Server();
 	~Server();
 	void accept_connection();
-	void receive_message(int client,int GameId,char* Word);
+	void receive_message(int client,int GameId,string Word);
 	void choose_game_type(int);
 };
 

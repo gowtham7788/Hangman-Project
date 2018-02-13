@@ -45,7 +45,10 @@
     <ClCompile Include="Difficulty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XmlParser.cpp">
+    <ClCompile Include="DatabaseXmlParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketXmlParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,11 +83,14 @@
     <ClInclude Include="GameDetails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XmlParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Property.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseXmlParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketXmlParser.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

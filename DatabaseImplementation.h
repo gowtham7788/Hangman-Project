@@ -6,7 +6,7 @@
 #include "Difficulty.h"
 #include "Words.h"
 #include "GameDetails.h"
-#include "XmlParser.h"
+#include "DatabaseXmlParser.h"
 #include "Property.h"
 
 class DatabaseImplementation :
@@ -16,6 +16,9 @@ private:
 	SQLHANDLE SqlConnHandle;
 	DatabaseConnection Connection;
 	Coder Cryption;
+	SQLRETURN procedure_call(SQLWCHAR* Query);
+	vector<GameDetails> get_game_details_from_sqlhandler(SQLHANDLE SqlHandle);
+	SQLHANDLE select(SQLHANDLE SqlHandle,SQLWCHAR* Query);
 	string insert_into_category(char* Name, int IsActive);
 	string insert_into_difficulty(char* Name, int IsActive);
 	string insert_into_words(int CategoryId, int DifficultyId, char* Word, int IsActive);
@@ -32,5 +35,6 @@ protected:
 	vector<GameDetails> get_playing_game_detail(int GameId);
 	string update_game_result(int GameId, char* Result);
 	int get_maximum_game_id();
+	vector<int> get_socket_address_by_game_id(int GameId);
 };
 

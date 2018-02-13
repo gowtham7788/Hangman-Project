@@ -14,7 +14,7 @@ void main(){
 
 	//object->load_data();
 	
-	cat=object->get_category();
+	/*cat=object->get_category();
 
 	for (unsigned int i = 0; i < cat.size(); i++){
 		cout << endl;
@@ -22,7 +22,7 @@ void main(){
 		cout << cat[i].get_name() << endl;
 		cout << cat[i].get_is_active() << endl;
 		cout << endl;
-	}
+	}*/
 
 	//dif = object->get_difficulty();
 
@@ -52,10 +52,10 @@ void main(){
 	//}
 
 
-	//int word = object->get_maximum_game_id();
-	//cout << endl;
-	//cout << word << endl;
-	//cout << endl;
+	int word = object->get_maximum_game_id();
+	cout << endl;
+	cout << word << endl;
+	cout << endl;
 
 	//string words = object->get_word("Animals","hard");
 	//cout << endl;
