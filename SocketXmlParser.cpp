@@ -44,9 +44,8 @@ int SocketXmlParser::create_or_join(char buffer[])												//parse the buffer
 	}
 	return 0;																					//return 0 if client send join game
 }
-string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, char Buffer[])
+string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, char Buffer[],int GameId)
 {
-	int GameId;
 	string Word;
 	xml_document<> document;
 	document.parse<0>(&Buffer[0]);
@@ -55,7 +54,6 @@ string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, 
 	string TagName = FirstNode->name();
 	if (TagName == CREATEGAME)
 	{
-		GameId = GameLogic.generate_gameid();
 		xml_node<> *CategoryNode = FirstNode->first_node(CATEGORY);
 		string Category = CategoryNode->value();
 		xml_node<> *LevelNode = FirstNode->first_node(LEVEL);
@@ -64,7 +62,6 @@ string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, 
 		string UserName = UserNameNode->value();
 		Word = GameLogic.get_word_from_database(Category, Level);													//send category and difficulty level to DB and get a word
 		GameLogic.insert_into_database(GameId, UserName, client, Word);													//send game id , username ,client sockaddr , word to DB
-		return Word;
 	}
 	else if (TagName == JOINGAME)
 	{
@@ -75,6 +72,6 @@ string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, 
 		string UserName = UserNameNode->value();
 		GameLogic.insert_into_database(GameId, UserName, client);
 		Word = "";
-		return Word;
 	}
+	return Word;
 }

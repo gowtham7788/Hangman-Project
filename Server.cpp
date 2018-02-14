@@ -81,6 +81,7 @@ void Server::choose_game_type(int client)
 		char Data[1024];
 		strcpy_s(Data, List.c_str());
 		send(client,Data, sizeof(Data), 0);
+		GameId = GameLogic.generate_gameid();
 	}
 	else
 	{
@@ -90,8 +91,7 @@ void Server::choose_game_type(int client)
 		send(client, Data, sizeof(Data), 0);
 	}
 	recv(client, Buffer1, sizeof(Buffer1), 0);
-	GameId = GameLogic.generate_gameid();
-	Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1);
+	Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1,GameId);
 	if (!Word.empty())
 	{
 		receive[GameId % 10] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);

@@ -1,12 +1,8 @@
 #include "GameLogic.h"
-
-
 GameLogic::GameLogic()
 {
 	DbInterface->load_data();
 }
-
-
 GameLogic::~GameLogic()
 {
 }
@@ -18,7 +14,6 @@ string GameLogic::get_wrong_guess()
 {
 	return WrongGuess;
 }
-
 vector<GameDetails> GameLogic::get_particular_gameid_details(int GameId)
 {
 	return DbInterface->get_playing_game_detail(GameId);
@@ -44,7 +39,6 @@ int GameLogic::generate_gameid()
 	int GameId = DbInterface->get_maximum_game_id();
 	return GameId + 1;
 }
-
 string GameLogic::category_list_and_difficulty_level()
 {
 	string List;
@@ -56,7 +50,6 @@ string GameLogic::category_list_and_difficulty_level()
 		List = List + "<"CATEGORY">" + CategoryList[iteration].get_name() + "</"CATEGORY">";
 	}
 	List = List + "</"CATEGORYLIST"><"DIFFICULTYLEVEL">";
-
 	vector<Difficulty> DifficultyLevel = DbInterface->get_difficulty();
 	for (iteration = 0; iteration < DifficultyLevel.size(); iteration++)
 	{
@@ -69,7 +62,6 @@ vector<int> GameLogic::get_socket_address_by_gameid_from_database(int GameId)
 {
 	return DbInterface->get_socket_address_by_game_id(GameId);
 }
-
 string GameLogic::get_all_playing_game()
 {
 	unsigned int iteration = 0;
@@ -85,7 +77,6 @@ string GameLogic::get_all_playing_game()
 		}
 	}
 	JoinGameidList = JoinGameidList + "</"JOIN"></"HANGMAN">";
-
 	return JoinGameidList;
 }
 string GameLogic::fill_dash(string Word)
@@ -105,7 +96,6 @@ string GameLogic::fill_dash(string Word)
 	}
 	return Dash;
 }
-
 string GameLogic::input_character(string Word, string Dash, char Letter)
 {
 	size_t CharIndex;
@@ -131,7 +121,6 @@ int GameLogic::calculate_number_of_dash(string Word)
 	}
 	return Count;
 }
-
 string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash, int GameId, char Letter)
 {
 	if (Dash.compare(FillDash) == 0)
@@ -158,7 +147,6 @@ string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash
 	{
 		Result = "PLAYING";
 	}
-	
 	string GameInfo = "<"HANGMAN"><"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"RESULT">" + Result + "</"RESULT">";
 	return GameInfo;
 }

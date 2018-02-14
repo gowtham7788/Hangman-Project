@@ -21,7 +21,6 @@ public:
 	string input_character(string Word, string Dash, char Letter);
 	string fill_dash(string Word);
 	string calculate_result(GameLogic, string Dash, string FillDash, int GameId, char Letter);
-
 	string get_word_from_database(string CategoryName, string DifficultyName);
 	string insert_into_database(int GameId, string Username, int SocketAddress, string Word);
 	string insert_into_database(int GameId, string UserName, int SocketAddress);
