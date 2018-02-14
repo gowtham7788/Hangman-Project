@@ -2,20 +2,14 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include "rapidxml.hpp"
-//#include "rapidxml_print.hpp"
 #include <iostream>
 #include <thread>
 #include <string>
 #include "SocketXmlParser.h"
 #include "GameLogic.h"
 #include "Property.h"
-
-
-
 #pragma comment(lib,"libws2_32.a")
 
-//using namespace std;
-//using namespace rapidxml;
 class Server
 {
 private:
@@ -23,14 +17,14 @@ private:
 	string Word;
 	int GameId = 0;
 	SOCKET server, client;
-	thread receive[4];
+	thread receive[10];
 	SOCKADDR_IN serverAddr, clientAddr;
 	
 public:
 	Server();
 	~Server();
 	void accept_connection();
-	void receive_message(int client,int GameId,string Word);
+	void receive_message(GameLogic Logic, int client, int GameId, string Word);
 	void choose_game_type(int);
 };
 

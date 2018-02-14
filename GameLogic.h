@@ -10,12 +10,13 @@ private:
 	int RemainingGuess = MAXIMUMGUESS;
 	string Result;
 	int DashCount = 0;
-	int get_remaining_guess();
-	string get_wrong_guess();
+	
 public:
 	GameLogic();
 	~GameLogic();
 	int generate_gameid();
+	int get_remaining_guess();
+	string get_wrong_guess();
 	int calculate_number_of_dash(string Word);
 	string input_character(string Word, string Dash, char Letter);
 	string fill_dash(string Word);

@@ -3,6 +3,7 @@
 
 GameLogic::GameLogic()
 {
+	DbInterface->load_data();
 }
 
 
@@ -11,7 +12,7 @@ GameLogic::~GameLogic()
 }
 int GameLogic::get_remaining_guess()
 {
-	return RemainingGuess;
+	return RemainingGuess;																		//return the Remaining guess
 }
 string GameLogic::get_wrong_guess()
 {
@@ -20,19 +21,16 @@ string GameLogic::get_wrong_guess()
 
 vector<GameDetails> GameLogic::get_particular_gameid_details(int GameId)
 {
-	vector<GameDetails> GameDetails = DbInterface->get_playing_game_detail(GameId);
-	return GameDetails;
+	return DbInterface->get_playing_game_detail(GameId);
 }
 
 string GameLogic::get_word_from_database(string CategoryName, string DifficultyName)
 {
-	string Word = DbInterface->get_word((char*)CategoryName.c_str(), (char*)DifficultyName.c_str());
-	return Word;
+	return DbInterface->get_word((char*)CategoryName.c_str(), (char*)DifficultyName.c_str());
 }
 string GameLogic::insert_into_database(int GameId, string UserName, int SocketAddress, string Word)
 {
-	string Status = DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)Word.c_str());
-	return Status;
+	return DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)Word.c_str());
 }
 string GameLogic::insert_into_database(int GameId, string UserName, int SocketAddress)
 {
@@ -55,36 +53,36 @@ string GameLogic::category_list_and_difficulty_level()
 	vector<Category> CategoryList = DbInterface->get_category();
 	for (iteration = 0; iteration < CategoryList.size(); iteration++)
 	{
-		string Category = CategoryList[iteration].get_name();
-		List = List + "<"CATEGORY">" + Category + "</"CATEGORY">";
+		List = List + "<"CATEGORY">" + CategoryList[iteration].get_name() + "</"CATEGORY">";
 	}
 	List = List + "</"CATEGORYLIST"><"DIFFICULTYLEVEL">";
 
 	vector<Difficulty> DifficultyLevel = DbInterface->get_difficulty();
 	for (iteration = 0; iteration < DifficultyLevel.size(); iteration++)
 	{
-		string Level = DifficultyLevel[iteration].get_name();
-		List = List + "<"LEVEL">" + Level + "</"LEVEL">";
+		List = List + "<"LEVEL">" + DifficultyLevel[iteration].get_name() + "</"LEVEL">";
 	}
 	List = List + "</"DIFFICULTYLEVEL"></"HANGMAN">";
 	return List;
 }
 vector<int> GameLogic::get_socket_address_by_gameid_from_database(int GameId)
 {
-	vector<int> SocketAddress = DbInterface->get_socket_address_by_game_id(GameId);
-	return SocketAddress;
+	return DbInterface->get_socket_address_by_game_id(GameId);
 }
 
 string GameLogic::get_all_playing_game()
 {
 	unsigned int iteration = 0;
+	int GameId = 0;
 	string JoinGameidList;
 	vector<GameDetails> GameDetail = DbInterface->get_playing_game_detail();
 	JoinGameidList = "<"HANGMAN"><"JOIN">";
-	for (iteration = 0; iteration < GameDetail.size(); iteration++)
+	for (iteration; iteration < GameDetail.size(); iteration++)
 	{
-		int Id = GameDetail[iteration].get_game_id();
-		JoinGameidList = JoinGameidList + "<"GAMEID">" + to_string(Id) + "</"GAMEID">";
+		if (GameId != GameDetail[iteration].get_game_id())
+		{
+			JoinGameidList = JoinGameidList + "<"GAMEID">" + to_string(GameDetail[iteration].get_game_id()) + "</"GAMEID">";
+		}
 	}
 	JoinGameidList = JoinGameidList + "</"JOIN"></"HANGMAN">";
 
@@ -148,19 +146,19 @@ string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash
 	DashCount = logic.calculate_number_of_dash(Dash);
 	if (DashCount == 0)
 	{
-		Result = "win";
+		Result = "WIN";
 		string status = DbInterface->update_game_result(GameId, (char*)Result.c_str());
 	}
 	else if (RemainingGuess == 0)
 	{
-		Result = "loss";
+		Result = "LOSE";
 		string status = DbInterface->update_game_result(GameId, (char*)Result.c_str());
 	}
 	else
 	{
-		Result = "playing";
+		Result = "PLAYING";
 	}
 	
-	string GameInfo = "<"HANGMAN"><"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"RESULT">" + Result + "</"RESULT">";
+	string GameInfo = "<"HANGMAN"><"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"RESULT">" + Result + "</"RESULT">";
 	return GameInfo;
 }

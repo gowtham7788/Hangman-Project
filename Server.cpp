@@ -7,49 +7,48 @@ Server::~Server()
 {
 }
 
-void Server::receive_message(int client, int GameId, string Word)
+void Server::receive_message(GameLogic logic,int client, int GameId, string Word)
 {
-	GameLogic logic;
-
 	string Dash;
 	char Buffer[1024];
 	int ReceivedBytes = 0;
-	char Letter[4] = {'l','i','o','n'};
+	char Letter =' ' ;
 	int client1;
-
 	Dash = logic.fill_dash(Word);
 	string FillDash = Dash;
 	string Result;
 	unsigned int iteration=0;
-	unsigned int i = 0;
 	unsigned int iteration1 = 0;
 	vector<GameDetails> GameDetails;				
-
 		while ( (GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)								//change client sockaddr using DB
 		{
 			iteration = iteration % GameDetails.size();
 			client = GameDetails[iteration].get_socket_address();
-			string GameInfo = logic.calculate_result(logic, Dash, FillDash, GameId,Letter[i]);
+			string GameInfo = logic.calculate_result(logic, Dash, FillDash, GameId,Letter);
 			for (iteration1 = 0; iteration1 < GameDetails.size(); iteration1++)							//send game info to the all UI which is in same game id
 			{
 				client1 = GameDetails[iteration1].get_socket_address();
 				if (client == client1)
 				{
-					Result = GameInfo + "<"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					send(client1, Result.c_str(), sizeof(Result), 0);
+					Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					char Data[1024];
+					strcpy_s(Data, Result.c_str());
+					send(client1, Data, sizeof(Data), 0);
 				}
 				else
 				{
-					Result = GameInfo + "<"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					send(client1, Result.c_str(), sizeof(Result), 0);
+					Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					char Data[1024];
+					strcpy_s(Data, Result.c_str());
+					send(client1, Data, sizeof(Data), 0);
 				}
 			}
 			Dash = XmlParse.get_dash(Result);
 			if ((GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)
 			{
 				ReceivedBytes = recv(client, Buffer, sizeof(Buffer), 0);
-				//Letter = XmlParse.get_letter(Buffer);
-				FillDash = XmlParse.parse_letter(Letter[i], GameId, Word, Dash);
+				Letter = XmlParse.get_letter(Buffer);
+				FillDash = logic.input_character(Word, Dash, Letter);
 			}
 			else
 			{
@@ -64,12 +63,12 @@ void Server::receive_message(int client, int GameId, string Word)
 				break;
 			}
 			iteration++;
-			i++;
 		}
 }
 void Server::choose_game_type(int client)
 {
 	char Buffer[1024];
+	char Buffer1[1024];
 	int GameId;
 	string Word;
 	string List;
@@ -79,42 +78,24 @@ void Server::choose_game_type(int client)
 	if (Choice == 1)
 	{
 		List = GameLogic.category_list_and_difficulty_level();														//send category and difficulty to UI
-		send(client, List.c_str(), sizeof(List), 0);
+		char Data[1024];
+		strcpy_s(Data, List.c_str());
+		send(client,Data, sizeof(Data), 0);
 	}
 	else
 	{
 		List = GameLogic.get_all_playing_game();																	//send available game id to UI
-		send(client, List.c_str(), sizeof(List), 0);
+		char Data[1024];
+		strcpy_s(Data, List.c_str());
+		send(client, Data, sizeof(Data), 0);
 	}
-	recv(client, Buffer, sizeof(Buffer), 0);
-	xml_document<> document;
-	document.parse<0>(&Buffer[0]);
-	xml_node<> *RootNode = document.first_node();
-	xml_node<> *FirstNode = RootNode->first_node();
-	string TagName = FirstNode->name();
-	if (TagName==CREATEGAME)
+	recv(client, Buffer1, sizeof(Buffer1), 0);
+	GameId = GameLogic.generate_gameid();
+	Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1);
+	if (!Word.empty())
 	{
-		GameId = GameLogic.generate_gameid();
-		xml_node<> *CategoryNode = FirstNode->first_node("category");
-		string Category = CategoryNode->value();
-		xml_node<> *LevelNode = FirstNode->first_node("level");
-		string Level = LevelNode->value();
-		xml_node<> *UserNameNode = RootNode->first_node("username");
-		string UserName = UserNameNode->value();
-		Word = (string)(GameLogic.get_word_from_database((string)Category.c_str(), (string)Level.c_str())).c_str();						//send category and difficulty level to DB and get a word
-		GameLogic.insert_into_database(GameId, (string)UserName.c_str(), client, Word);													//send game id , username ,client sockaddr , word to DB
-		receive[GameId] = thread(&Server::receive_message, this, client, GameId, Word);
+		receive[GameId % 10] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);
 	}
-	else if (TagName==JOINGAME)
-	{
-		xml_node<> *GameIdNode = FirstNode->first_node("gameid");
-		string GameIdUser = GameIdNode->value();
-		GameId = stoi(GameIdUser);
-		xml_node<> *UserNameNode = RootNode->first_node("username");
-		string UserName = UserNameNode->value();
-		GameLogic.insert_into_database(GameId, (string)UserName.c_str(), client);
-	}
-	document.clear();
 }
 void Server::accept_connection()
 {
@@ -136,7 +117,7 @@ void Server::accept_connection()
 	{
 		cout << "\nbind error ";
 	}
-	listen(server, 3);
+	listen(server, 5);
 	cout << "\nListening for incoming connections..." << endl;
 	
 	int clientAddrSize = sizeof(clientAddr);

@@ -11,11 +11,9 @@ class SocketXmlParser
 public:
 	SocketXmlParser();
 	~SocketXmlParser();	
-	string parse_letter(char Letter, int GameId, string Word, string Dash);
-	char get_letter(string Buffer);
-	int create_or_join(string Buffer);
+	char get_letter(char Buffer[]);
+	int create_or_join(char Buffer[]);
 	string get_dash(string Buffer);
-	
-
+	string creategame_or_joingame(int client,GameLogic,char Buffer[]);
 };
 
