@@ -8,7 +8,6 @@ private:
 	DatabaseInterface* DbInterface = new DatabaseImplementation();
 	char WrongGuess[MAXIMUMGUESS];
 	int RemainingGuess = MAXIMUMGUESS;
-	string Result;
 	int DashCount = 0;
 	
 public:
@@ -29,6 +28,8 @@ public:
 	vector<GameDetails> get_particular_gameid_details(int GameId);
 	vector<GameDetails> get_all_game_details();
 	vector<int> get_socket_address_by_gameid_from_database(int GameId);
-	
+	string update_game_details(int GameId, int SocketAddress, string Result);
+	string update_game_details(int GameId, string Result);
+	vector<GameDetails> check_game_detail();
 };
 

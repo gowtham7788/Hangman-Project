@@ -36,5 +36,6 @@ protected:
 	string update_game_result(int GameId, char* Result);
 	int get_maximum_game_id();
 	vector<int> get_socket_address_by_game_id(int GameId);
+	string update_game_result(int GameId, int SocketAddress, char* Result) ;
 };
 

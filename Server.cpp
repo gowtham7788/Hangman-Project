@@ -1,12 +1,10 @@
 #include "Server.h"
-
 Server::Server()
 {
 }
 Server::~Server()
 {
 }
-
 void Server::receive_message(GameLogic logic,int client, int GameId, string Word)
 {
 	string Dash;
@@ -30,14 +28,28 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 				client1 = GameDetails[iteration1].get_socket_address();
 				if (client == client1)
 				{
-					Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					if (logic.get_remaining_guess() == 0)
+					{
+						Result = GameInfo + "<"WORDS">" + Word + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					}
+					else
+					{
+						Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					}
 					char Data[1024];
 					strcpy_s(Data, Result.c_str());
 					send(client1, Data, sizeof(Data), 0);
 				}
 				else
 				{
-					Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					if (logic.get_remaining_guess() == 0)
+					{
+						Result = GameInfo + "<"WORDS">" + Word + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					}
+					else
+					{
+						Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+					}
 					char Data[1024];
 					strcpy_s(Data, Result.c_str());
 					send(client1, Data, sizeof(Data), 0);
@@ -47,8 +59,21 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 			if ((GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)
 			{
 				ReceivedBytes = recv(client, Buffer, sizeof(Buffer), 0);
-				Letter = XmlParse.get_letter(Buffer);
-				FillDash = logic.input_character(Word, Dash, Letter);
+				if (ReceivedBytes > 0)
+				{
+					Letter = XmlParse.get_letter(Buffer);
+					FillDash = logic.input_character(Word, Dash, Letter);
+				}
+				else if (ReceivedBytes == 0)
+				{
+					//logic.update_game_details(GameId, client, "EXITED");
+					cout << "connection closed" << endl;
+				}
+				else
+				{
+					logic.update_game_details(GameId, client, "EXITED");
+					cout << "Client disconnected" << WSAGetLastError() << endl;
+				}
 			}
 			else
 			{
@@ -70,11 +95,24 @@ void Server::choose_game_type(int client)
 	char Buffer[1024];
 	char Buffer1[1024];
 	int GameId;
+	int Choice = -1;
 	string Word;
 	string List;
 	GameLogic GameLogic;
-	recv(client, Buffer, sizeof(Buffer), 0);
-	int Choice = XmlParse.create_or_join(Buffer);
+	int ReceivedBytes = 0; 
+	ReceivedBytes = recv(client, Buffer, sizeof(Buffer), 0);
+	if (ReceivedBytes > 0)
+	{
+		Choice = XmlParse.create_or_join(Buffer);
+	}
+	else if (ReceivedBytes == 0)
+	{
+		cout << "connection closed" << endl;
+	}
+	else
+	{
+		cout << "Client disconnected" << WSAGetLastError() << endl;
+	}
 	if (Choice == 1)
 	{
 		List = GameLogic.category_list_and_difficulty_level();														//send category and difficulty to UI
@@ -83,15 +121,30 @@ void Server::choose_game_type(int client)
 		send(client,Data, sizeof(Data), 0);
 		GameId = GameLogic.generate_gameid();
 	}
-	else
+	else if (Choice == 0)
 	{
 		List = GameLogic.get_all_playing_game();																	//send available game id to UI
 		char Data[1024];
 		strcpy_s(Data, List.c_str());
 		send(client, Data, sizeof(Data), 0);
+		if (GameLogic.check_game_detail().empty())
+		{
+			choose_game_type(client);
+		}
 	}
-	recv(client, Buffer1, sizeof(Buffer1), 0);
-	Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1,GameId);
+	ReceivedBytes = recv(client, Buffer1, sizeof(Buffer1), 0);
+	if (ReceivedBytes > 0)
+	{
+		Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1, GameId);
+	}
+	else if (ReceivedBytes == 0)
+	{
+		cout << "connection closed" << endl;
+	}
+	else
+	{
+		cout << "Client disconnected" << WSAGetLastError() << endl;
+	}
 	if (!Word.empty())
 	{
 		receive[GameId % 10] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);

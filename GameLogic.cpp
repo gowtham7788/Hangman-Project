@@ -6,61 +6,82 @@ GameLogic::GameLogic()
 GameLogic::~GameLogic()
 {
 }
+//It returns the Remaining guess
 int GameLogic::get_remaining_guess()
 {
-	return RemainingGuess;																		//return the Remaining guess
+	return RemainingGuess;																		
 }
+//It returns the wrong guessess
 string GameLogic::get_wrong_guess()
 {
 	return WrongGuess;
 }
+//It returns the particular game id details
 vector<GameDetails> GameLogic::get_particular_gameid_details(int GameId)
 {
 	return DbInterface->get_playing_game_detail(GameId);
 }
-
+//It returns a word according to Category and Difficulty from database
 string GameLogic::get_word_from_database(string CategoryName, string DifficultyName)
 {
 	return DbInterface->get_word((char*)CategoryName.c_str(), (char*)DifficultyName.c_str());
 }
+//It will insert the game details into database and returns the status
 string GameLogic::insert_into_database(int GameId, string UserName, int SocketAddress, string Word)
 {
 	return DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)Word.c_str());
 }
+//It will get the wordfrom databaseand insert the game details into database and returns the status
 string GameLogic::insert_into_database(int GameId, string UserName, int SocketAddress)
 {
 	vector<GameDetails> GameDetail = DbInterface->get_playing_game_detail(GameId);
 	string DbWord = (GameDetail[0].get_word_id().get_word());
-	string Status = DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)DbWord.c_str());
-	return Status;
+	return DbInterface->insert_into_game_details(GameId, (char*)UserName.c_str(), SocketAddress, (char*)DbWord.c_str());
 }
+//It will generate the new game id for new game
 int GameLogic::generate_gameid()
 {
-	int GameId = DbInterface->get_maximum_game_id();
-	return GameId + 1;
+	return (DbInterface->get_maximum_game_id() + 1);
 }
+//It will get the category list and difficulty list from the database
 string GameLogic::category_list_and_difficulty_level()
 {
 	string List;
 	unsigned int iteration = 0;
-	List = "<"HANGMAN"><"CATEGORYLIST">";
+	List = "<"HANGMAN"><"CATEGORYLIST">";																				//open root tags
 	vector<Category> CategoryList = DbInterface->get_category();
 	for (iteration = 0; iteration < CategoryList.size(); iteration++)
 	{
-		List = List + "<"CATEGORY">" + CategoryList[iteration].get_name() + "</"CATEGORY">";
+		List = List + "<"CATEGORY">" + CategoryList[iteration].get_name() + "</"CATEGORY">";                           //add the category name
 	}
 	List = List + "</"CATEGORYLIST"><"DIFFICULTYLEVEL">";
 	vector<Difficulty> DifficultyLevel = DbInterface->get_difficulty();
 	for (iteration = 0; iteration < DifficultyLevel.size(); iteration++)
 	{
-		List = List + "<"LEVEL">" + DifficultyLevel[iteration].get_name() + "</"LEVEL">";
+		List = List + "<"LEVEL">" + DifficultyLevel[iteration].get_name() + "</"LEVEL">";								//add the difficulty level
 	}
-	List = List + "</"DIFFICULTYLEVEL"></"HANGMAN">";
+	List = List + "</"DIFFICULTYLEVEL"></"HANGMAN">";																	//close the root tags
 	return List;
 }
+//It will return the socket address which are playing under given game id
 vector<int> GameLogic::get_socket_address_by_gameid_from_database(int GameId)
 {
 	return DbInterface->get_socket_address_by_game_id(GameId);
+}
+//It will update the database if client closes their interface
+string GameLogic::update_game_details(int GameId, int SocketAddress, string Result)
+{
+	return DbInterface->update_game_result(GameId, SocketAddress, (char*)Result.c_str());
+}
+//It will update the databse after game finished whether win or lose
+string GameLogic::update_game_details(int GameId, string Result)
+{
+	return DbInterface->update_game_result(GameId, (char*)Result.c_str());
+}
+//It will return the 
+vector<GameDetails> GameLogic::check_game_detail()
+{
+	return DbInterface->get_playing_game_detail();
 }
 string GameLogic::get_all_playing_game()
 {
@@ -69,14 +90,21 @@ string GameLogic::get_all_playing_game()
 	string JoinGameidList;
 	vector<GameDetails> GameDetail = DbInterface->get_playing_game_detail();
 	JoinGameidList = "<"HANGMAN"><"JOIN">";
-	for (iteration; iteration < GameDetail.size(); iteration++)
+	if (GameDetail.size() <= 0)
 	{
-		if (GameId != GameDetail[iteration].get_game_id())
+		for (iteration; iteration < GameDetail.size(); iteration++)
 		{
-			JoinGameidList = JoinGameidList + "<"GAMEID">" + to_string(GameDetail[iteration].get_game_id()) + "</"GAMEID">";
+			if (GameId != GameDetail[iteration].get_game_id())
+			{
+				JoinGameidList = JoinGameidList + "<"GAMEID">" + to_string(GameDetail[iteration].get_game_id()) + "</"GAMEID">";
+			}
 		}
+		JoinGameidList = JoinGameidList + "</"JOIN"></"HANGMAN">";
 	}
-	JoinGameidList = JoinGameidList + "</"JOIN"></"HANGMAN">";
+	else
+	{
+		JoinGameidList = JoinGameidList + "<"GAMEID"></"GAMEID"></"JOIN"></"HANGMAN">";
+	}
 	return JoinGameidList;
 }
 string GameLogic::fill_dash(string Word)
@@ -123,6 +151,7 @@ int GameLogic::calculate_number_of_dash(string Word)
 }
 string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash, int GameId, char Letter)
 {
+	string Result;
 	if (Dash.compare(FillDash) == 0)
 	{
 		WrongGuess[MAXIMUMGUESS - RemainingGuess] = Letter;
@@ -133,20 +162,24 @@ string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash
 		Dash = FillDash;
 	}
 	DashCount = logic.calculate_number_of_dash(Dash);
+	string GameInfo = "<"HANGMAN"><"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID">";
 	if (DashCount == 0)
 	{
 		Result = "WIN";
-		string status = DbInterface->update_game_result(GameId, (char*)Result.c_str());
+		GameInfo = GameInfo + "<"RESULT">" + Result + "</"RESULT"><"WORDS">" + Dash + "</"WORDS">";
+		string status = update_game_details(GameId, Result);
 	}
 	else if (RemainingGuess == 0)
 	{
 		Result = "LOSE";
-		string status = DbInterface->update_game_result(GameId, (char*)Result.c_str());
+		GameInfo = GameInfo + "<"RESULT">" + Result + "</"RESULT">";
+		string status = update_game_details(GameId,Result);
 	}
 	else
 	{
 		Result = "PLAYING";
+		GameInfo = GameInfo + "<"RESULT">" + Result + "</"RESULT"><"WORDS">" + Dash + "</"WORDS">";
 	}
-	string GameInfo = "<"HANGMAN"><"GAMEINFO"><"GAMEID"> " + to_string(GameId) + "</"GAMEID"><"WORDS">" + Dash + "</"WORDS"><"RESULT">" + Result + "</"RESULT">";
+	
 	return GameInfo;
 }

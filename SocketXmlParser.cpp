@@ -21,8 +21,8 @@ char SocketXmlParser::get_letter(char Buffer[])
 	char Letter;
 	string XmlLetter;
 	document.parse<0>(&Buffer[0]);
-	xml_node<> *RootNode = document.first_node();
-	xml_node<> *FirstNode = RootNode->first_node();
+	xml_node<> *RootNode = document.first_node(HANGMAN);
+	xml_node<> *FirstNode = RootNode->first_node(LETTER);
 	string TagName = FirstNode->name();
 	if (TagName == LETTER)
 	{
@@ -35,7 +35,7 @@ int SocketXmlParser::create_or_join(char buffer[])												//parse the buffer
 {
 	xml_document<> document;
 	document.parse<0>(&buffer[0]);
-	xml_node<> *RootNode = document.first_node();
+	xml_node<> *RootNode = document.first_node(HANGMAN);
 	xml_node<> *FirstNode = RootNode->first_node();
 	string TagName = FirstNode->name();
 	if (TagName == CREATE)
@@ -49,7 +49,7 @@ string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, 
 	string Word;
 	xml_document<> document;
 	document.parse<0>(&Buffer[0]);
-	xml_node<> *RootNode = document.first_node();
+	xml_node<> *RootNode = document.first_node(HANGMAN);
 	xml_node<> *FirstNode = RootNode->first_node();
 	string TagName = FirstNode->name();
 	if (TagName == CREATEGAME)

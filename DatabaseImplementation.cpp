@@ -5,7 +5,6 @@ then the encryption key value is set here*/
 DatabaseImplementation::DatabaseImplementation()
 {
 	SqlConnHandle = Connection.get_connection_handler();
-	Cryption.set_key(KEY);
 }
 
 /*In destructor the connection handler is delete to free memory*/
@@ -212,6 +211,26 @@ string DatabaseImplementation::update_game_result(int GameId, char* Result)
 	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlGameId, 0, &PtrValue);
 	strcpy_s((char*)SqlResult, _countof(SqlResult), Result);
 	SqlGameId = GameId;
+	ReturnCode = SQLExecute(SqlHandle);
+	/*check whether the query is executed successfully if not then it will return a string*/
+	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);
+	return (SQL_SUCCESS != ReturnCode) ? "Error Quering SQL Server" : "Updated Successfully";
+}
+
+string DatabaseImplementation::update_game_result(int GameId, int SocketAddress,char* Result)
+{
+	SQLHANDLE SqlHandle = NULL;
+	SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
+	SQLRETURN ReturnCode;
+	char SqlResult[50];
+	SQLINTEGER SqlGameId, SqlSocketAddress,PtrValue = SQL_NTS;
+	ReturnCode = SQLPrepare(SqlHandle, UPDATE_GAME_RESULT_EXIT, SQL_NTS);
+	ReturnCode = SQLBindParameter(SqlHandle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, strlen(Result), 0, &SqlResult, 0, &PtrValue);
+	ReturnCode = SQLBindParameter(SqlHandle, 2, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlGameId, 0, &PtrValue);
+	ReturnCode = SQLBindParameter(SqlHandle, 3, SQL_PARAM_INPUT, SQL_C_SSHORT, SQL_INTEGER, 0, 0, &SqlSocketAddress, 0, &PtrValue);
+	strcpy_s((char*)SqlResult, _countof(SqlResult), Result);
+	SqlGameId = GameId;
+	SqlSocketAddress = SocketAddress;
 	ReturnCode = SQLExecute(SqlHandle);
 	/*check whether the query is executed successfully if not then it will return a string*/
 	SQLFreeHandle(SQL_HANDLE_STMT, SqlHandle);

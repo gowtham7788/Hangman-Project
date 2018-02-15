@@ -14,8 +14,6 @@ class Server
 {
 private:
 	SocketXmlParser XmlParse;
-	//string Word;
-	//int GameId = 0;
 	SOCKET server, client;
 	thread receive[10];
 	SOCKADDR_IN serverAddr, clientAddr;

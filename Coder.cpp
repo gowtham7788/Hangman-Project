@@ -8,16 +8,6 @@ Coder::Coder()
 Coder::~Coder()
 {
 }
-/*Getter and setter methods for the variable key*/
-void Coder::set_key(int Key)
-{
-	this->Key = Key;
-}
-
-int Coder::get_key()
-{
-	return this->Key;
-}
 
 /*this method encode the given string and return a encoded string*/
 string Coder::encoder(string Words)
@@ -31,7 +21,7 @@ string Coder::encoder(string Words)
 	{
 		if (isalpha(EncodeWord[i]))
 		{
-			for (int j = 0; j < Key; j++)
+			for (int j = 0; j < KEY; j++)
 			{
 				if (EncodeWord[i] == 'z')
 				{
@@ -49,7 +39,7 @@ string Coder::encoder(string Words)
 		}
 		if (isdigit(EncodeWord[i]))
 		{
-			for (int j = 0; j < Key; j++)
+			for (int j = 0; j < KEY; j++)
 			{
 				if (EncodeWord[i] == '9')
 				{
@@ -78,7 +68,7 @@ string Coder::decoder(string Word)
 	{
 		if (isalpha(DecodeWord[i]))
 		{
-			for (int j = 0; j < Key; j++)
+			for (int j = 0; j < KEY; j++)
 			{
 				if (DecodeWord[i] == 'a')
 				{
@@ -96,7 +86,7 @@ string Coder::decoder(string Word)
 		}
 		if (isdigit(DecodeWord[i]))
 		{
-			for (int j = 0; j < Key; j++)
+			for (int j = 0; j < KEY; j++)
 			{
 				if (DecodeWord[i] == '0')
 				{

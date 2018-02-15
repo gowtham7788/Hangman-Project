@@ -82,7 +82,9 @@
 
 #define GET_WORD L"select top 1 word from words join category on category.id = words.categoryid join difficulty on difficulty.id = words.difficultyid where category.name = ? and difficulty.name = ? order by newid()"
 
-#define UPDATE_GAME_RESULT L"update gamedetails set result = ? where GameId = ?"
+#define UPDATE_GAME_RESULT L"update gamedetails set result = ? where GameId = ? and Result = 'playing'"
+
+#define UPDATE_GAME_RESULT_EXIT L"update gamedetails set result = ? where GameId = ? and Result = 'playing' and socketaddress = ?"
 
 #define GET_MAXIMUM_GAME_ID L"select max(gameid) from gamedetails"
 
