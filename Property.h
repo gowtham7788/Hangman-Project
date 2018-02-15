@@ -58,7 +58,7 @@
 
 #define DIFFICULTY_ID "DifficultyId"
 
-#define XML_FILE "Data.xml"
+#define XML_FILE "./Data.xml"
 
 #define CONNECTION_DRIVER L"DRIVER={SQL Server};SERVER=IN11W-TRAINEE5\\SQLEXPRESS,49400;DATABASE=Hangman;Trusted=true;"
 

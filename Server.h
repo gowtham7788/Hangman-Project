@@ -17,6 +17,8 @@ private:
 	SOCKET server, client;
 	thread receive[10];
 	SOCKADDR_IN serverAddr, clientAddr;
+	int flag = 0;
+	string get_result(GameLogic Logic, string GameInfo, string Word, int Chance);
 	
 public:
 	Server();

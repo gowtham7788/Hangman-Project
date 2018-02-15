@@ -28,35 +28,21 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 				client1 = GameDetails[iteration1].get_socket_address();
 				if (client == client1)
 				{
-					if (logic.get_remaining_guess() == 0)
-					{
-						Result = GameInfo + "<"WORDS">" + Word + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					}
-					else
-					{
-						Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(1) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					}
+					Result = get_result(logic, GameInfo, Word, 1);
 					char Data[1024];
 					strcpy_s(Data, Result.c_str());
-					send(client1, Data, sizeof(Data), 0);
+					send(client1, Data, sizeof(Data), 0);												
 				}
 				else
 				{
-					if (logic.get_remaining_guess() == 0)
-					{
-						Result = GameInfo + "<"WORDS">" + Word + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					}
-					else
-					{
-						Result = GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(0) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
-					}
+					Result = get_result(logic, GameInfo, Word, 0);
 					char Data[1024];
 					strcpy_s(Data, Result.c_str());
 					send(client1, Data, sizeof(Data), 0);
 				}
 			}
 			Dash = XmlParse.get_dash(Result);
-			if ((GameDetails = logic.get_particular_gameid_details(GameId)).size()>0)
+			if ((logic.get_particular_gameid_details(GameId)).size()>0)
 			{
 				ReceivedBytes = recv(client, Buffer, sizeof(Buffer), 0);
 				if (ReceivedBytes > 0)
@@ -66,7 +52,7 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 				}
 				else if (ReceivedBytes == 0)
 				{
-					//logic.update_game_details(GameId, client, "EXITED");
+					logic.update_game_details(GameId, client, "EXITED");
 					cout << "connection closed" << endl;
 				}
 				else
@@ -75,18 +61,7 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 					cout << "Client disconnected" << WSAGetLastError() << endl;
 				}
 			}
-			else
-			{
-				vector<int> ClientAddress;
-				unsigned int iteration2 = 0;
-				ClientAddress = logic.get_socket_address_by_gameid_from_database(GameId);
-				while (iteration2 < ClientAddress.size())
-				{
-					choose_game_type(ClientAddress[iteration2]);
-					iteration2++;
-				}
-				break;
-			}
+		
 			iteration++;
 		}
 }
@@ -119,35 +94,41 @@ void Server::choose_game_type(int client)
 		char Data[1024];
 		strcpy_s(Data, List.c_str());
 		send(client,Data, sizeof(Data), 0);
-		GameId = GameLogic.generate_gameid();
 	}
 	else if (Choice == 0)
 	{
-		List = GameLogic.get_all_playing_game();																	//send available game id to UI
+		List = GameLogic.get_all_playing_game();																	//get available game id from database
 		char Data[1024];
 		strcpy_s(Data, List.c_str());
-		send(client, Data, sizeof(Data), 0);
+		send(client, Data, sizeof(Data), 0);																		//send available game id to client
 		if (GameLogic.check_game_detail().empty())
 		{
+			flag = 1;
 			choose_game_type(client);
+			flag = 0;
 		}
 	}
-	ReceivedBytes = recv(client, Buffer1, sizeof(Buffer1), 0);
-	if (ReceivedBytes > 0)
+	if (flag == 0)
 	{
-		Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1, GameId);
-	}
-	else if (ReceivedBytes == 0)
-	{
-		cout << "connection closed" << endl;
-	}
-	else
-	{
-		cout << "Client disconnected" << WSAGetLastError() << endl;
-	}
-	if (!Word.empty())
-	{
-		receive[GameId % 10] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);
+		ReceivedBytes = recv(client, Buffer1, sizeof(Buffer1), 0);
+		if (ReceivedBytes > 0)
+		{
+			GameId = GameLogic.generate_gameid();																		//generate game id
+			Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1, GameId);
+			if (!Word.empty())
+			{
+				receive[GameId % 10] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);
+				client = 0;
+			}
+		}
+		else if (ReceivedBytes == 0)
+		{
+			cout << "connection closed" << endl;
+		}
+		else
+		{
+			cout << "Client disconnected" << WSAGetLastError() << endl;
+		}
 	}
 }
 void Server::accept_connection()
@@ -177,7 +158,7 @@ void Server::accept_connection()
 	while (1)
 	{
 		
-		if ((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
+		if ((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)									//connect the client to the server
 		{
 			cout << "Client connected!" << endl;
 
@@ -190,4 +171,16 @@ void Server::accept_connection()
 	}
 	cout << "Client disconnected." << endl;
 	
+}
+
+string Server::get_result(GameLogic logic, string GameInfo, string Word, int Chance)
+{
+	if (logic.get_remaining_guess() == 0)
+	{
+		return GameInfo + "<"WORDS">" + Word + "</"WORDS"><"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(Chance) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+	}
+	else
+	{
+		return GameInfo + "<"REMAININGGUESS">" + to_string(logic.get_remaining_guess()) + "</"REMAININGGUESS"><"WRONGGUESS">" + logic.get_wrong_guess() + "</"WRONGGUESS"><"CHANCE">" + to_string(Chance) + "</"CHANCE"></"GAMEINFO"></"HANGMAN">";
+	}
 }

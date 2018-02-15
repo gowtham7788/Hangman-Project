@@ -78,11 +78,12 @@ string GameLogic::update_game_details(int GameId, string Result)
 {
 	return DbInterface->update_game_result(GameId, (char*)Result.c_str());
 }
-//It will return the 
+//It will return the GameDetails 
 vector<GameDetails> GameLogic::check_game_detail()
 {
 	return DbInterface->get_playing_game_detail();
 }
+//It returns string which contains available game id 
 string GameLogic::get_all_playing_game()
 {
 	unsigned int iteration = 0;
@@ -90,23 +91,25 @@ string GameLogic::get_all_playing_game()
 	string JoinGameidList;
 	vector<GameDetails> GameDetail = DbInterface->get_playing_game_detail();
 	JoinGameidList = "<"HANGMAN"><"JOIN">";
-	if (GameDetail.size() <= 0)
+	if (!GameDetail.empty())
 	{
 		for (iteration; iteration < GameDetail.size(); iteration++)
 		{
 			if (GameId != GameDetail[iteration].get_game_id())
 			{
 				JoinGameidList = JoinGameidList + "<"GAMEID">" + to_string(GameDetail[iteration].get_game_id()) + "</"GAMEID">";
+				GameId = GameDetail[iteration].get_game_id();
 			}
 		}
 		JoinGameidList = JoinGameidList + "</"JOIN"></"HANGMAN">";
 	}
 	else
 	{
-		JoinGameidList = JoinGameidList + "<"GAMEID"></"GAMEID"></"JOIN"></"HANGMAN">";
+		JoinGameidList = JoinGameidList + "<"GAMEID">0</"GAMEID"></"JOIN"></"HANGMAN">";
 	}
 	return JoinGameidList;
 }
+//It will return the Dash which is same as the given Word
 string GameLogic::fill_dash(string Word)
 {
 	size_t Index = 0;
@@ -124,6 +127,7 @@ string GameLogic::fill_dash(string Word)
 	}
 	return Dash;
 }
+//It will replace the dash with given letter if the letter available in word otherwise it returns the Dash
 string GameLogic::input_character(string Word, string Dash, char Letter)
 {
 	size_t CharIndex;
@@ -136,6 +140,7 @@ string GameLogic::input_character(string Word, string Dash, char Letter)
 	}
 	return Dash;
 }
+//It will returns number dash present in the given word
 int GameLogic::calculate_number_of_dash(string Word)
 {
 	size_t Index;
@@ -149,6 +154,7 @@ int GameLogic::calculate_number_of_dash(string Word)
 	}
 	return Count;
 }
+//It will return the string with Game id , Result and the dashed word 
 string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash, int GameId, char Letter)
 {
 	string Result;
@@ -180,6 +186,5 @@ string GameLogic::calculate_result(GameLogic logic, string Dash, string FillDash
 		Result = "PLAYING";
 		GameInfo = GameInfo + "<"RESULT">" + Result + "</"RESULT"><"WORDS">" + Dash + "</"WORDS">";
 	}
-	
 	return GameInfo;
 }
