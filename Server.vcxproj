@@ -217,18 +217,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Category.cpp" />
     <ClCompile Include="Coder.cpp" />
     <ClCompile Include="DatabaseConnection.cpp" />
     <ClCompile Include="DatabaseImplementation.cpp" />
     <ClCompile Include="Difficulty.cpp" />
+    <ClCompile Include="GameDetails.cpp" />
     <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="DatabaseXmlParser.cpp" />
     <ClCompile Include="SocketXmlParser.cpp" />
-    <ClCompile Include="\\in11w-raman-4\Trainees_Backup\Old\Gowtham\Hangman\Category.cpp" />
-    <ClCompile Include="\\in11w-raman-4\Trainees_Backup\Old\Gowtham\Hangman\GameDetails.cpp" />
-    <ClCompile Include="\\in11w-raman-4\Trainees_Backup\Old\Gowtham\Hangman\Words.cpp" />
+    <ClCompile Include="Words.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Category.h" />
@@ -246,10 +246,7 @@
     <ClInclude Include="\\in11w-raman-4\Trainees_Backup\Old\Gowtham\Hangman\Words.h" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="Data.xml">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-    </Xml>
+    <Xml Include="Data.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

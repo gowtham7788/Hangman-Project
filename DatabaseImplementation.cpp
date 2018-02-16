@@ -397,64 +397,71 @@ void DatabaseImplementation::load_data()
 	xml_document<> Document;
 	xml_node<> *Node;
 	ifstream File(XML_FILE);
-	stringstream Buffer;
-	Buffer << File.rdbuf();
-	File.close();
-	string Content(Buffer.str());
-	Document.parse<0>(&Content[0]);
-	Node = Document.first_node();
-	Xml.set_node(Node);
-	vector<Category> CatergoryVector;
-	vector<Difficulty> DifficultyVector;
-	vector<Words> WordVector;
-	SQLRETURN ReturnCode;
-	string Status;
-	
-	ReturnCode = procedure_call(CHECK_TABLE_PROCEDURE);
-	if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
+	if (File)
 	{
-		return;
-	}
-	else
-	{
-		ReturnCode = procedure_call(CREATE_CATEGORY_PROCEDURE);
+		stringstream Buffer;
+		Buffer << File.rdbuf();
+		File.close();
+		string Content(Buffer.str());
+		Document.parse<0>(&Content[0]);
+		Node = Document.first_node();
+		Xml.set_node(Node);
+		vector<Category> CatergoryVector;
+		vector<Difficulty> DifficultyVector;
+		vector<Words> WordVector;
+		SQLRETURN ReturnCode;
+		string Status;
+
+		ReturnCode = procedure_call(CHECK_TABLE_PROCEDURE);
 		if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 		{
 			return;
 		}
 		else
 		{
-			CatergoryVector = Xml.get_category_from_xml(Xml.get_node());
-			for (size_t i = 0; i < CatergoryVector.size(); i++)
-			{
-				Status = insert_into_category((char*)CatergoryVector[i].get_name().c_str(),CatergoryVector[i].get_is_active());
-			}
-			ReturnCode = procedure_call(CREATE_DIFFICULTY_PROCEDURE);
+			ReturnCode = procedure_call(CREATE_CATEGORY_PROCEDURE);
 			if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 			{
 				return;
 			}
 			else
 			{
-				DifficultyVector = Xml.get_difficulty_from_xml(Xml.get_node());
-				for (size_t i = 0; i < DifficultyVector.size(); i++)
+				CatergoryVector = Xml.get_category_from_xml(Xml.get_node());
+				for (size_t i = 0; i < CatergoryVector.size(); i++)
 				{
-					Status = insert_into_difficulty((char*)DifficultyVector[i].get_name().c_str(), DifficultyVector[i].get_is_active());
+					Status = insert_into_category((char*)CatergoryVector[i].get_name().c_str(), CatergoryVector[i].get_is_active());
 				}
-				ReturnCode = procedure_call(CREATE_WORDS_PROCEDURE);
+				ReturnCode = procedure_call(CREATE_DIFFICULTY_PROCEDURE);
 				if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
 				{
 					return;
 				}
 				else
 				{
-					WordVector = Xml.get_words_from_xml(Xml.get_node());
-					for (size_t i = 0; i < WordVector.size(); i++)
+					DifficultyVector = Xml.get_difficulty_from_xml(Xml.get_node());
+					for (size_t i = 0; i < DifficultyVector.size(); i++)
 					{
-						Status = insert_into_words(WordVector[i].get_category_id().get_id(), WordVector[i].get_difficulty_id().get_id(), (char*)WordVector[i].get_word().c_str(), WordVector[i].get_is_active());
+						Status = insert_into_difficulty((char*)DifficultyVector[i].get_name().c_str(), DifficultyVector[i].get_is_active());
+					}
+					ReturnCode = procedure_call(CREATE_WORDS_PROCEDURE);
+					if ((SQL_SUCCESS != ReturnCode) && (ReturnCode != SQL_SUCCESS_WITH_INFO))
+					{
+						return;
+					}
+					else
+					{
+						WordVector = Xml.get_words_from_xml(Xml.get_node());
+						for (size_t i = 0; i < WordVector.size(); i++)
+						{
+							Status = insert_into_words(WordVector[i].get_category_id().get_id(), WordVector[i].get_difficulty_id().get_id(), (char*)WordVector[i].get_word().c_str(), WordVector[i].get_is_active());
+						}
 					}
 				}
 			}
 		}
+	}
+	else
+	{
+		cout << "Data.Xml file is missing so the program starts with old data" << endl;
 	}
 }

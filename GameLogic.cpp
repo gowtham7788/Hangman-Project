@@ -118,7 +118,7 @@ string GameLogic::fill_dash(string Word)
 	{
 		if (!isspace(Word[Index]))
 		{
-			Dash.append("_");
+			Dash.append("*");
 		}
 		else
 		{
@@ -147,7 +147,7 @@ int GameLogic::calculate_number_of_dash(string Word)
 	int Count = 0;
 	for (Index = 0; Index < Word.size(); Index++)
 	{
-		if (Word[Index] == '_')
+		if (Word[Index] == '*')
 		{
 			Count++;
 		}
