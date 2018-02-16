@@ -15,7 +15,7 @@ class Server
 private:
 	SocketXmlParser XmlParse;
 	SOCKET server, client;
-	thread receive[10];
+	thread receive[50];
 	SOCKADDR_IN serverAddr, clientAddr;
 	int flag = 0;
 	string get_result(GameLogic Logic, string GameInfo, string Word, int Chance);

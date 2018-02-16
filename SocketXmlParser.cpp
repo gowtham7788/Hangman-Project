@@ -46,6 +46,7 @@ int SocketXmlParser::create_or_join(char buffer[])												//parse the buffer
 	{
 		return 0;																					//return 0 if client send join game
 	}
+	return -1;
 }
 string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, char Buffer[],int GameId)
 {

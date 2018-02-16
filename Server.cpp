@@ -31,7 +31,7 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 					Result = get_result(logic, GameInfo, Word, 1);
 					char Data[1024];
 					strcpy_s(Data, Result.c_str());
-					send(client1, Data, sizeof(Data), 0);												
+					send(client1, Data, sizeof(Data), 0);												//send game info  to the client
 				}
 				else
 				{
@@ -52,18 +52,19 @@ void Server::receive_message(GameLogic logic,int client, int GameId, string Word
 				}
 				else if (ReceivedBytes == 0)
 				{
-					logic.update_game_details(GameId, client, "EXITED");
+					logic.update_game_details(GameId, client, "EXITED");									//update result as EXITED if the client close
 					cout << "connection closed" << endl;
 				}
 				else
 				{
-					logic.update_game_details(GameId, client, "EXITED");
+					logic.update_game_details(GameId, client, "EXITED");									//update result as EXITED if the client disconnected
 					cout << "Client disconnected" << WSAGetLastError() << endl;
 				}
 			}
 		
 			iteration++;
 		}
+		ExitThread(0);
 }
 void Server::choose_game_type(int client)
 {
@@ -117,8 +118,7 @@ void Server::choose_game_type(int client)
 			Word = XmlParse.creategame_or_joingame(client, GameLogic, Buffer1, GameId);
 			if (!Word.empty())
 			{
-				receive[GameId % 10] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);
-				client = 0;
+				receive[GameId % 50] = thread(&Server::receive_message, this, GameLogic, client, GameId, Word);
 			}
 		}
 		else if (ReceivedBytes == 0)
@@ -172,7 +172,7 @@ void Server::accept_connection()
 	cout << "Client disconnected." << endl;
 	
 }
-
+//It returns the game information
 string Server::get_result(GameLogic logic, string GameInfo, string Word, int Chance)
 {
 	if (logic.get_remaining_guess() == 0)
