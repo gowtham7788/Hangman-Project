@@ -3,11 +3,11 @@
 /*This file contains the geter and setter methods for the class Words*/
 Words::Words()
 {
+
 }
-
-
 Words::~Words()
 {
+
 }
 
 void Words::set_id(int Id)

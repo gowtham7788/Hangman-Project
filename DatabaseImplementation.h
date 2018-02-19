@@ -34,8 +34,10 @@ protected:
 	vector<GameDetails> get_playing_game_detail();
 	vector<GameDetails> get_playing_game_detail(int GameId);
 	string update_game_result(int GameId, char* Result);
+	string update_game_result(int GameId, int SocketAddress, char* Result);
 	int get_maximum_game_id();
 	vector<int> get_socket_address_by_game_id(int GameId);
-	string update_game_result(int GameId, int SocketAddress, char* Result) ;
+	vector<GameDetails> get_updated_result(int GameId);
+	vector<GameDetails> get_updated_result(int GameId,int SocketAddress);
 };
 

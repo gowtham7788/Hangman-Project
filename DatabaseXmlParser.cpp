@@ -1,13 +1,5 @@
 #include "DatabaseXmlParser.h"
 
-DatabaseXmlParser::DatabaseXmlParser()
-{
-}
-
-
-DatabaseXmlParser::~DatabaseXmlParser()
-{
-}
 
 /*Getter and setter method for the varibale xml_node*/
 void DatabaseXmlParser::set_node(xml_node<>* Node)

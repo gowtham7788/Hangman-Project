@@ -21,5 +21,7 @@ public:
 	virtual string update_game_result(int GameId, int SocketAddress, char* Result) = 0;
 	virtual int get_maximum_game_id() = 0;
 	virtual vector<int> get_socket_address_by_game_id(int GameId) = 0;
-	
+	virtual vector<GameDetails> get_updated_result(int GameId) = 0;
+	virtual vector<GameDetails> get_updated_result(int GameId, int SocketAddress) = 0;
+
 };

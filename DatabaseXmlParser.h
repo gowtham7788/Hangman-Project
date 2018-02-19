@@ -21,8 +21,6 @@ private:
 	xml_node<> *Node;
 	
 public:
-	DatabaseXmlParser();
-	~DatabaseXmlParser();
 	xml_node<> *create_parser();
 	vector<Category> get_category_from_xml(xml_node<> *Node);
 	vector<Difficulty> get_difficulty_from_xml(xml_node<> *Node);

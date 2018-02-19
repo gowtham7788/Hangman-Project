@@ -18,8 +18,7 @@ private:
 	string Result;
 
 public:
-	GameDetails();
-	~GameDetails();
+
 	void set_id(int Id);
 	int get_id();
 	void set_game_id(int GameId);

@@ -11,8 +11,7 @@ private:
 	int IsActive;
 
 public:
-	Category();
-	~Category();
+
 	void set_id(int Id);
 	int get_id();
 	void set_is_active(int IsActive);

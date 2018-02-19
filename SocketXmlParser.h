@@ -7,11 +7,9 @@
 class SocketXmlParser
 {
 public:
-	SocketXmlParser();
-	~SocketXmlParser();	
-	char get_letter(char Buffer[]);
+	char parse_letter(char Buffer[]);
 	int create_or_join(char Buffer[]);
-	string get_dash(string Buffer);
+	string parse_dash(string Buffer);
 	string creategame_or_joingame(int client,GameLogic,char Buffer[],int GameId);
 };
 

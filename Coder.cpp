@@ -1,13 +1,6 @@
 #include "Coder.h"
 
 
-Coder::Coder()
-{
-}
-
-Coder::~Coder()
-{
-}
 
 /*this method encode the given string and return a encoded string*/
 string Coder::encoder(string Words)

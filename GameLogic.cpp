@@ -109,7 +109,7 @@ string GameLogic::get_all_playing_game()
 	}
 	return JoinGameidList;
 }
-//It will return the Dash which is same as the given Word
+//It will return the Dash which is same size as the given Word
 string GameLogic::fill_dash(string Word)
 {
 	size_t Index = 0;
