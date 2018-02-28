@@ -13,8 +13,6 @@ private:
 	int IsActive;
 
 public:
-	Words();
-	~Words();
 	void set_id(int Id);
 	int get_id();
 	void set_category_id(Category CategoryId);

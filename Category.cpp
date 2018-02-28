@@ -2,15 +2,6 @@
 
 /*This file contains the geter and setter methods for the class Category*/
 
-Category::Category()
-{
-}
-
-
-Category::~Category()
-{
-}
-
 void Category::set_id(int Id)
 {
 	this->Id = Id;

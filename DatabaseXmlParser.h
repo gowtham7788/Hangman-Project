@@ -19,7 +19,6 @@ class DatabaseXmlParser
 private:
 	xml_document<> Document;
 	xml_node<> *Node;
-	
 public:
 	DatabaseXmlParser();
 	~DatabaseXmlParser();

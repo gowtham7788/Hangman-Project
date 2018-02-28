@@ -17,11 +17,11 @@ private:
 	DatabaseConnection Connection;
 	Coder Cryption;
 	SQLRETURN procedure_call(SQLWCHAR* Query);
-	vector<GameDetails> get_game_details_from_sqlhandler(SQLHANDLE SqlHandle);
-	SQLHANDLE select(SQLHANDLE SqlHandle,SQLWCHAR* Query);
-	string insert_into_category(char* Name, int IsActive);
-	string insert_into_difficulty(char* Name, int IsActive);
-	string insert_into_words(int CategoryId, int DifficultyId, char* Word, int IsActive);
+	vector<GameDetails> get_game_details(SQLHANDLE SqlHandle);
+	SQLHANDLE select(SQLHANDLE SqlHandle, SQLWCHAR* Query);
+	void insert_into_category(vector<Category>);
+	void insert_into_difficulty(vector<Difficulty>);
+	void insert_into_words(vector<Words>);
 public:
 	DatabaseImplementation();
 	~DatabaseImplementation();
@@ -34,8 +34,10 @@ protected:
 	vector<GameDetails> get_playing_game_detail();
 	vector<GameDetails> get_playing_game_detail(int GameId);
 	string update_game_result(int GameId, char* Result);
+	string update_game_result(int GameId, int SocketAddress, char* Result);
 	int get_maximum_game_id();
 	vector<int> get_socket_address_by_game_id(int GameId);
-	string update_game_result(int GameId, int SocketAddress, char* Result) ;
+	vector<GameDetails> get_updated_result(int GameId);
+	vector<GameDetails> get_updated_result(int GameId, int SocketAddress);
 };
 

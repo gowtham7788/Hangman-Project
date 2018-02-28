@@ -1,14 +1,6 @@
 #include "Difficulty.h"
 
 /*This file contains the geter and setter methods for the class Difficulty*/
-Difficulty::Difficulty()
-{
-}
-
-
-Difficulty::~Difficulty()
-{
-}
 
 void Difficulty::set_id(int Id)
 {

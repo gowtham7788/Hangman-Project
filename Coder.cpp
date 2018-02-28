@@ -1,22 +1,11 @@
 #include "Coder.h"
 
-
-Coder::Coder()
-{
-}
-
-Coder::~Coder()
-{
-}
-
 /*this method encode the given string and return a encoded string*/
 string Coder::encoder(string Words)
 {
 	string EncodeWord = Words;
 	int WordLength;
-
 	WordLength = (int)EncodeWord.length();
-
 	for (int i = 0; i < WordLength; i++)
 	{
 		if (isalpha(EncodeWord[i]))
@@ -61,9 +50,7 @@ string Coder::decoder(string Word)
 {
 	string DecodeWord = Word;
 	int WordLength;
-
 	WordLength = (int)DecodeWord.length();
-
 	for (int i = 0; i < WordLength; i++)
 	{
 		if (isalpha(DecodeWord[i]))

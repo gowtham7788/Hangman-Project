@@ -7,10 +7,9 @@
 using namespace std;
 int main()
 {
-	Server ServerObject;
-	ServerObject.accept_connection();
+	Server Server;
+	Server.accept_connection();
 	cin.get();
 	cin.ignore(1000, '\n');
 	return 0;
 }
-

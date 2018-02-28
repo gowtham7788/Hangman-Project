@@ -1,0 +1,136 @@
+30670 [4148] INFO Main <> - Opening Application
+30670 [4148] INFO Database Connection <> - Connecting Sql Server
+61310 [4148] FATAL Database Connection <> - Could not connect to SQL Server
+61310 [4148] WARN Database Implementation <> - Data.Xml file is missing so the program starts with old data
+61326 [4148] INFO Server <> - Listening for incoming connections...
+78720 [6344] INFO Database Connection <> - Connecting Sql Server
+78814 [6344] INFO Database Connection <> - Successfully connected to SQL Server
+79828 [6344] INFO SocketXmlParser <> - Started parse_user_option function 
+79828 [6344] INFO SocketXmlParser <> - Received create request from the client
+79828 [6344] INFO Game <> - Started fetch_category_list_and_difficulty_level function 
+79828 [6344] INFO Database Implementation <> - Getting Category from Database
+79843 [6344] INFO Database Implementation <> - Getting Difficulty from Database
+79843 [6344] INFO Game <> - Finished fetch_category_list_and_difficulty_level function 
+79843 [6344] INFO Server <> - Started send_message function 
+79843 [6344] INFO Server <> - Message sent to client
+80810 [6344] INFO Database Implementation <> - Getting Maximum game id from Database
+80810 [6344] INFO SocketXmlParser <> - Started parse_category_difficulty_and_fetch_word function 
+80810 [6344] INFO SocketXmlParser <> - Parsed Category
+80810 [6344] INFO SocketXmlParser <> - Parsed difficulty level
+80810 [6344] INFO SocketXmlParser <> - Parsed user name
+80810 [6344] INFO Database Implementation <> - Getting Random Word from Database
+80826 [6344] INFO Database Implementation <> - Inserting Game details into Database
+80826 [6344] INFO Database Implementation <> - Inserted Successfully
+80826 [6344] INFO SocketXmlParser <> - Client added to the database
+80826 [6344] INFO Server <> - te socket 
+80826 [1812] INFO Server <> - Started process_message function 
+80826 [1812] INFO Game <> - Started fill_dash function 
+80826 [1812] INFO Game <> - Finished fill_dash function 
+80826 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+80842 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+80842 [1812] INFO Game <> - Started calculate_result function 
+80842 [1812] INFO Game <> - Started calculate_number_of_dash function 
+80842 [1812] INFO Game <> - Finished calculate_number_of_dash function 
+80842 [1812] INFO Game <> - Finished calculate_result function 
+80842 [1812] INFO Server <> - Started get_result function 
+80842 [1812] INFO Server <> - Started send_message function 
+80842 [1812] INFO Server <> - Message sent to client
+80842 [1812] INFO SocketXmlParser <> - Started parse_dash function 
+80842 [1812] INFO SocketXmlParser <> - Finished parse_dash function 
+80842 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+80842 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+84476 [1812] INFO Server <> - Letter received from the client
+84476 [1812] INFO SocketXmlParser <> - Started parse_letter function 
+84476 [1812] INFO SocketXmlParser <> - Letter parsed successfully
+84476 [1812] INFO Game <> - Started input_character 
+84476 [1812] INFO Game <> - Finished input_character 
+84476 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+84476 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+84476 [1812] INFO Game <> - Started calculate_result function 
+84476 [1812] INFO Game <> - Started calculate_number_of_dash function 
+84476 [1812] INFO Game <> - Finished calculate_number_of_dash function 
+84476 [1812] INFO Game <> - Finished calculate_result function 
+84476 [1812] INFO Server <> - Started get_result function 
+84476 [1812] INFO Server <> - Started send_message function 
+84476 [1812] INFO Server <> - Message sent to client
+84476 [1812] INFO SocketXmlParser <> - Started parse_dash function 
+84476 [1812] INFO SocketXmlParser <> - Finished parse_dash function 
+84476 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+84476 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+86489 [1812] INFO Server <> - Letter received from the client
+86489 [1812] INFO SocketXmlParser <> - Started parse_letter function 
+86489 [1812] INFO SocketXmlParser <> - Letter parsed successfully
+86489 [1812] INFO Game <> - Started input_character 
+86489 [1812] INFO Game <> - Finished input_character 
+86504 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+86504 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+86504 [1812] INFO Game <> - Started calculate_result function 
+86504 [1812] INFO Game <> - Started calculate_number_of_dash function 
+86504 [1812] INFO Game <> - Finished calculate_number_of_dash function 
+86504 [1812] INFO Game <> - Finished calculate_result function 
+86504 [1812] INFO Server <> - Started get_result function 
+86504 [1812] INFO Server <> - Started send_message function 
+86504 [1812] INFO Server <> - Message sent to client
+86504 [1812] INFO SocketXmlParser <> - Started parse_dash function 
+86504 [1812] INFO SocketXmlParser <> - Finished parse_dash function 
+86504 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+86504 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+87269 [1812] INFO Server <> - Letter received from the client
+87269 [1812] INFO SocketXmlParser <> - Started parse_letter function 
+87269 [1812] INFO SocketXmlParser <> - Letter parsed successfully
+87269 [1812] INFO Game <> - Started input_character 
+87269 [1812] INFO Game <> - Finished input_character 
+87269 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+87269 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+87269 [1812] INFO Game <> - Started calculate_result function 
+87269 [1812] INFO Game <> - Started calculate_number_of_dash function 
+87269 [1812] INFO Game <> - Finished calculate_number_of_dash function 
+87269 [1812] INFO Game <> - Finished calculate_result function 
+87269 [1812] INFO Server <> - Started get_result function 
+87269 [1812] INFO Server <> - Started send_message function 
+87269 [1812] INFO Server <> - Message sent to client
+87269 [1812] INFO SocketXmlParser <> - Started parse_dash function 
+87269 [1812] INFO SocketXmlParser <> - Finished parse_dash function 
+87269 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+87269 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+87846 [1812] INFO Server <> - Letter received from the client
+87846 [1812] INFO SocketXmlParser <> - Started parse_letter function 
+87846 [1812] INFO SocketXmlParser <> - Letter parsed successfully
+87846 [1812] INFO Game <> - Started input_character 
+87846 [1812] INFO Game <> - Finished input_character 
+87846 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+87846 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+87846 [1812] INFO Game <> - Started calculate_result function 
+87846 [1812] INFO Game <> - Started calculate_number_of_dash function 
+87846 [1812] INFO Game <> - Finished calculate_number_of_dash function 
+87846 [1812] INFO Game <> - Finished calculate_result function 
+87846 [1812] INFO Server <> - Started get_result function 
+87846 [1812] INFO Server <> - Started send_message function 
+87846 [1812] INFO Server <> - Message sent to client
+87846 [1812] INFO SocketXmlParser <> - Started parse_dash function 
+87846 [1812] INFO SocketXmlParser <> - Finished parse_dash function 
+87846 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+87846 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+88454 [1812] INFO Server <> - Letter received from the client
+88454 [1812] INFO SocketXmlParser <> - Started parse_letter function 
+88454 [1812] INFO SocketXmlParser <> - Letter parsed successfully
+88454 [1812] INFO Game <> - Started input_character 
+88454 [1812] INFO Game <> - Finished input_character 
+88454 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+88454 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+88454 [1812] INFO Game <> - Started calculate_result function 
+88454 [1812] INFO Game <> - Started calculate_number_of_dash function 
+88454 [1812] INFO Game <> - Finished calculate_number_of_dash function 
+88454 [1812] INFO Database Implementation <> - Updating Game result to Database
+88454 [1812] INFO Database Implementation <> - Updated Successfully
+88454 [1812] INFO Game <> - Finished calculate_result function 
+88454 [1812] INFO Server <> - Started get_result function 
+88454 [1812] INFO Server <> - Started send_message function 
+88470 [1812] INFO Server <> - Message sent to client
+88470 [1812] INFO SocketXmlParser <> - Started parse_dash function 
+88470 [1812] INFO SocketXmlParser <> - Finished parse_dash function 
+88470 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+88470 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+88470 [1812] INFO Database Implementation <> - Getting Game details with Game id from Database
+88470 [1812] INFO Database Implementation <> - Getting Game details from SQl handler
+88470 [1812] INFO Server <> - Finished process_message function 

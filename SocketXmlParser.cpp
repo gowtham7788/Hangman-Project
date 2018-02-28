@@ -1,11 +1,5 @@
 #include "SocketXmlParser.h"
-SocketXmlParser::SocketXmlParser()
-{
-}
-SocketXmlParser::~SocketXmlParser()
-{
-}
-string SocketXmlParser::get_dash(string Buffer)
+string SocketXmlParser::parse_dash(string Buffer)
 {
 	string Dash;
 	xml_document<> document;
@@ -15,7 +9,7 @@ string SocketXmlParser::get_dash(string Buffer)
 	xml_node<> *Element = FirstNode->first_node(WORDS);												//parse the given buffer and get the Word		
 	return Dash = Element->value();
 }
-char SocketXmlParser::get_letter(char Buffer[])
+char SocketXmlParser::parse_letter(char Buffer[])
 {
 	xml_document<> document;
 	char Letter;
@@ -23,15 +17,11 @@ char SocketXmlParser::get_letter(char Buffer[])
 	document.parse<0>(&Buffer[0]);
 	xml_node<> *RootNode = document.first_node(HANGMAN);
 	xml_node<> *FirstNode = RootNode->first_node(LETTER);
-	string TagName = FirstNode->name();
-	if (TagName == LETTER)
-	{
-		XmlLetter = FirstNode->value();																	//parse the given buffer and get the letter which is given by client
-		Letter = XmlLetter[0];
-	}
+	XmlLetter = FirstNode->value();																//parse the given buffer and get the letter which is given by client
+	Letter = XmlLetter[0];
 	return Letter;
 }
-int SocketXmlParser::create_or_join(char buffer[])												//parse the buffer and identify whether the client send create or join game
+bool SocketXmlParser::parse_user_option(char buffer[])													//parse the buffer and identify whether the client send create or join game
 {
 	xml_document<> document;
 	document.parse<0>(&buffer[0]);
@@ -40,15 +30,11 @@ int SocketXmlParser::create_or_join(char buffer[])												//parse the buffer
 	string TagName = FirstNode->name();
 	if (TagName == CREATE)
 	{
-		return 1;																				//return 1 if client send create game
+		return 1;																					//return 1 if client send create game
 	}
-	else if (TagName == JOIN)
-	{
-		return 0;																					//return 0 if client send join game
-	}
-	return -1;
+return 0;																					//return 0 if client send join game
 }
-string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, char Buffer[],int GameId)
+string SocketXmlParser::parse_category_difficulty_and_fetch_word(int Client, Game Game, char Buffer[], int GameId)
 {
 	string Word;
 	xml_document<> document;
@@ -64,8 +50,8 @@ string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, 
 		string Level = LevelNode->value();
 		xml_node<> *UserNameNode = RootNode->first_node(USERNAME);
 		string UserName = UserNameNode->value();
-		Word = GameLogic.get_word_from_database(Category, Level);													//send category and difficulty level to DB and get a word
-		GameLogic.insert_into_database(GameId, UserName, client, Word);													//send game id , username ,client sockaddr , word to DB
+		Word = Game.fetch_word_from_database(Category, Level);														//send category and difficulty level to DB and get a word
+		Game.insert_into_database(GameId, UserName, Client, Word);													//send game id , username ,client sockaddr , word to DB
 	}
 	else if (TagName == JOINGAME)
 	{
@@ -74,7 +60,7 @@ string SocketXmlParser::creategame_or_joingame(int client, GameLogic GameLogic, 
 		GameId = stoi(GameIdUser);
 		xml_node<> *UserNameNode = RootNode->first_node(USERNAME);
 		string UserName = UserNameNode->value();
-		GameLogic.insert_into_database(GameId, UserName, client);
+		Game.insert_into_database(GameId, UserName, Client);
 		Word = "";
 	}
 	return Word;

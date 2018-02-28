@@ -19,6 +19,7 @@ DatabaseConnection::DatabaseConnection()
 					1024,
 					NULL,
 					SQL_DRIVER_NOPROMPT);
+				
 				SQLAllocHandle(SQL_HANDLE_STMT, SqlConnHandle, &SqlHandle);
 			}
 		}

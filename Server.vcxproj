@@ -118,12 +118,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\sekar-1\Desktop\log4cplus-1.2.1\log4cplus-1.2.1\include;C:\Users\sekar-1\Desktop\log4cplus\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\sekar-1\Downloads;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libws2_32.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\sekar-1\Desktop\log4cplus\src\Debug;C:\Users\sekar-1\Downloads;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libws2_32.a;log4cplusUD.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -184,6 +185,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -223,7 +225,7 @@
     <ClCompile Include="DatabaseImplementation.cpp" />
     <ClCompile Include="Difficulty.cpp" />
     <ClCompile Include="GameDetails.cpp" />
-    <ClCompile Include="GameLogic.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="DatabaseXmlParser.cpp" />
@@ -238,7 +240,7 @@
     <ClInclude Include="DatabaseInterface.h" />
     <ClInclude Include="Difficulty.h" />
     <ClInclude Include="GameDetails.h" />
-    <ClInclude Include="GameLogic.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Property.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="DatabaseXmlParser.h" />

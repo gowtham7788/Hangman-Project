@@ -12,8 +12,6 @@ private:
 	int IsActive;
 
 public:
-	Difficulty();
-	~Difficulty();
 	void set_id(int Id);
 	int get_id();
 	void set_is_active(int IsActive);

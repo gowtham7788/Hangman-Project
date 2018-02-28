@@ -1,14 +1,6 @@
 #include "GameDetails.h"
 
 /*This file contains the geter and setter methods for the class GameDetails*/
-GameDetails::GameDetails()
-{
-}
-
-
-GameDetails::~GameDetails()
-{
-}
 
 void GameDetails::set_id(int Id)
 {
